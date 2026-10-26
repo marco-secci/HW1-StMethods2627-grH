@@ -1,0 +1,49 @@
+---
+title: "GroupX_HM0"
+author: "A. Rossi, B. Verdi, C. Bianchi"
+output: 
+  pdf_document:
+    toc: true
+    toc_depth: 3
+date: "2022-10-20"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## FSDS - Chapter X 
+
+### Ex X.x
+
+*Here the text of the first exercise.*
+
+**Solution**
+
+Add comments to the solution.
+
+```{r cars, echo=T}
+summary(cars)
+```
+
+### Ex X.x
+
+*Here the text of the second exercise.*
+
+**Solution**
+
+Add comments to the solution.
+
+$$ Y \sim N(0,1)$$
+
+## CS - Chapter X 
+
+### Ex X.x
+
+*Here the text of the first exercise from Wood's textbook.*
+
+**Solution**
+
+Add comments to the solution.
+
+$$ X \sim N(0,1)$$
