@@ -1,0 +1,14 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+# Personal study notes
+Secci/FSDS-3.2-hints.Rmd
+Secci/FSDS-3.2-hints.html
+
+# Knit/LaTeX build artifacts
+*.log
+*.tex
+*.aux
+GroupX_HM0.html
