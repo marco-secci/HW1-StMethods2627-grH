@@ -13,7 +13,7 @@ The exercise block assigned to us is block B, formed by the following exercises 
 - CS: Chapter 1, exercises 1.1, 1.6
 - CS: Chapter 3, exercises 3.5, 3.6
 - FSDS: Chapter 2, exercises 2.8, 2.16, 2.21, 2.26, 2.52, 2.53, 2.70
-- FSDS: Chapter 3, exercises 3.2, 3.16, 3.24 (use R)
+- FSDS: Chapter 3, exercises 3.2, 3.16, 3.24 (use R) (Secci)
 - FSDS: Chapter 4, exercises 4.8, 4.14, 4.34
 - FSDS: Chapter 5, exercises 5.8, 5.50, 5.58
 
