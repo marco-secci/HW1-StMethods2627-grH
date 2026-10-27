@@ -69,9 +69,11 @@ So 0.515 is only `r round(z, 2)` standard errors above 0.5. This is well within 
 
 **Conclusion.** The poll result is not surprising under the 50% presumption: a tied race produces a poll this far from 50% quite often. So we would not be willing to predict that Kelly wins based on this poll alone. This is unlike the California exit poll in Section 3.1.1, where 65.5% was about 15 standard errors from 0.5. Also, real exit polls are not simple random samples, so the true uncertainty is likely larger than this standard error suggests.
 
-### Ex X.x
+### Ex 3.16
 
-*Here the text of the second exercise.*
+*According to the U.S. Census Bureau, the number of people in a household has a mean of 2.6 and a standard deviation of 1.5. Suppose the Census Bureau instead had estimated this mean using a random sample of 225 homes, and that sample had a mean of 2.4 and standard deviation of 1.4.*
+
+*Describe the center and spread of the (a) population distribution, (b) sample data distribution, (c) sampling distribution of the sample mean for 225 homes.*
 
 **Solution**
 
@@ -79,7 +81,7 @@ Add comments to the solution.
 
 $$ Y \sim N(0,1)$$
 
-## CS - Chapter X 
+## CS - Chapter X
 
 ### Ex X.x
 
