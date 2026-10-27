@@ -1,12 +1,20 @@
 ---
 title: "Group H - Assignment Block B"
-author: "A. Rossi, B. Verdi, C. Bianchi"
-output: 
+author: "J. Al Sayed Kassem, B. Hadman, N. Pinat, M. Secci, F. Tomada"
+date: "2026-10-27"
+output:
+  html_document:
+    toc: true
+    toc_depth: '3'
+    df_print: paged
   pdf_document:
     toc: true
     toc_depth: 3
-date: "2022-10-20"
 ---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
 
 ## CS - Chapter 1
 
@@ -75,7 +83,9 @@ Variance of the difference $\text{Var}(X - Y)$:
 
 $$\text{Var}(X - Y) = \text{Var}(X) + \text{Var}(-Y) + 2\text{Cov}(X, -Y) = \sigma_x^2 + \sigma_y^2 - 2\sigma_{xy}$$
 
-## Ex 3.5
+## CS - Chapter 3
+
+### Ex 3.5
 
 ```{r Ex 3.5 CS, echo=T}
 # Setup
@@ -205,3 +215,72 @@ Each time a person shops at a grocery store, the event of catching a cold or som
 2. **Analysis of part (b):**
    **Yes**, we would expect the Poisson distribution to adequately describe the number of weekly hospital admissions for a rare disease.
    * **Rationale:** In this case, admissions satisfy the fundamental hypotheses of the Poisson process: events are rare, occur independently, and the average admission rate ($\lambda$) over time can be considered reasonably constant, without extreme systematic fluctuations as in the previous case.
+
+## FSDS - Chapter 3
+
+### Ex 3.2
+
+*In an exit poll of 1648 voters in the 2020 Senatorial election in Arizona, 51.5% said they voted for Mark Kelly and 48.5% said they voted for Martha McSally.*
+
+*(a) Suppose that actually 50% of the population voted for Kelly. If this exit poll had the properties of a simple random sample, find the standard error of the sample proportion voting for him.*
+
+*(b) Under the 50% presumption, are the results of the exit poll surprising? Why? Would you be willing to predict the election outcome? Explain by (i) conducting a simulation; (ii) using the value found in (a) for the standard error.*
+
+**Solution**
+
+```{r ex3.2-data}
+n     <- 1648   # poll size
+p_obs <- 0.515  # observed proportion for Kelly
+p0    <- 0.5    # presumed population proportion (H0)
+```
+
+**(a)** Under $\pi = 0.5$, the number of votes for Kelly is $Y \sim \text{Bin}(n, \pi)$ and the sample proportion $\hat\pi = Y/n$ has standard error
+
+$$ \sigma_{\hat\pi} = \sqrt{\frac{\pi(1-\pi)}{n}}. $$
+
+```{r ex3.2-a}
+se <- sqrt(p0 * (1 - p0) / n)
+se
+```
+
+**(b)(i)** We simulate $10^6$ exit polls of size $n$ from a population where $\pi = 0.5$. `rbinom` returns counts, so we divide by $n$ to get proportions.
+
+```{r ex3.2-b-i}
+set.seed(0)
+B <- 1e6
+results <- rbinom(B, n, p0) / n
+mean(results); sd(results)
+
+hist(results, breaks = 50, main = "Sample proportions under H0: pi = 0.5",
+     xlab = "Sample proportion")
+abline(v = p_obs, col = "red", lwd = 2)
+
+# share of simulated polls with at least 51.5% for Kelly
+mean(results >= p_obs)
+```
+
+The simulated standard deviation (`r sprintf("%.5f", sd(results))`) matches the standard error from (a) (`r sprintf("%.5f", se)`), as expected. About `r round(100 * mean(results >= p_obs), 1)`% of the simulated polls give 51.5% or more for Kelly even though the race is exactly 50/50. By symmetry, about twice as many fall at least that far from 0.5 in either direction.
+
+**(b)(ii)** Using the standard error from (a), we measure how many standard errors the observed proportion lies from 0.5:
+
+```{r ex3.2-b-ii}
+z <- (p_obs - p0) / se
+z
+1 - pnorm(z)   # normal approximation, compare with the simulation
+```
+
+So 0.515 is only `r round(z, 2)` standard errors above 0.5. This is well within the range of about $\pm 3$ standard errors where almost all sample proportions fall, and the normal approximation gives nearly the same tail probability as the simulation.
+
+**Conclusion.** The poll result is not surprising under the 50% presumption: a tied race produces a poll this far from 50% quite often. So we would not be willing to predict that Kelly wins based on this poll alone. This is unlike the California exit poll in Section 3.1.1, where 65.5% was about 15 standard errors from 0.5. Also, real exit polls are not simple random samples, so the true uncertainty is likely larger than this standard error suggests.
+
+### Ex 3.16
+
+*According to the U.S. Census Bureau, the number of people in a household has a mean of 2.6 and a standard deviation of 1.5. Suppose the Census Bureau instead had estimated this mean using a random sample of 225 homes, and that sample had a mean of 2.4 and standard deviation of 1.4.*
+
+*Describe the center and spread of the (a) population distribution, (b) sample data distribution, (c) sampling distribution of the sample mean for 225 homes.*
+
+**Solution**
+
+Add comments to the solution.
+
+$$ Y \sim N(0,1)$$
