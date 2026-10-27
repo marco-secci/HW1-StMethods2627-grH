@@ -1,5 +1,5 @@
 ---
-title: "Group H - Assignment Block A"
+title: "Group H - Assignment Block B"
 author: "A. Rossi, B. Verdi, C. Bianchi"
 output: 
   pdf_document:
