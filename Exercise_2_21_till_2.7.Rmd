@@ -1,0 +1,483 @@
+---
+title: "Statistical Methods - Homework 1"
+author: "Bilal Hamdan"
+date: "2026-10-29"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+## FSDS - Chapter 2
+
+### Exercise 2.21
+
+**Question:** Plot the Gamma distribution with shape parameter
+k = 3 and scale parameters 0.5, 1, 2, 3, 4, 5.
+What is the effect of increasing the scale parameter?
+
+**Solution:**
+
+```{r gamma-exercise}
+# Set the shape and scale parameters
+k <- 3
+scales <- c(0.5, 1, 2, 3, 4, 5)
+
+# Create x values
+x <- seq(0, 40, length.out = 1000)
+
+# Plot the first Gamma distribution
+plot(x, dgamma(x, shape = k, scale = scales[1]),
+     type = "l", col = 1, lwd = 2,
+     ylim = c(0, 0.6),
+     xlab = "x", ylab = "Probability Density",
+     main = "Gamma Distribution (Shape = 3)")
+
+# Add the other distributions
+for (i in 2:length(scales)) {
+  lines(x, dgamma(x, shape = k, scale = scales[i]),
+        col = i, lwd = 2)
+}
+
+# Add the legend
+legend("topright",
+       legend = paste("Scale =", scales),
+       col = 1:6, lwd = 2, cex = 0.8)
+```
+
+**Interpretation:**
+
+Increasing the scale parameter makes the Gamma distribution
+more spread out and shifts it toward larger values.
+
+The mean and variance of a Gamma distribution are:
+
+$$
+E(X) = k\theta
+$$
+
+$$
+Var(X) = k\theta^2
+$$
+
+Since the shape parameter k = 3 remains fixed,
+increasing the scale parameter increases both
+the mean and the variance.
+
+The density curve becomes wider and flatter,
+while its total area remains equal to 1.
+
+### Exercise 2.26
+
+**Question:** Refer to Table 2.4, cross-classifying happiness
+with family income.
+
+(a) Find and interpret the correlation using scores:
+(i) (1, 2, 3) for each variable;
+(ii) (1, 2, 3) for income and (1, 4, 5) for happiness.
+
+(b) Construct the joint distribution with the same marginal
+distributions, assuming independence.
+
+**Solution (a): Correlation**
+
+```{r exercise-2-26-correlation}
+# Joint probability distribution from Table 2.4
+P <- matrix(c(0.080, 0.198, 0.079,
+              0.043, 0.254, 0.143,
+              0.017, 0.105, 0.081),
+            nrow = 3, byrow = TRUE)
+
+# Marginal probabilities
+px <- rowSums(P)
+py <- colSums(P)
+
+# Income scores
+x <- c(1, 2, 3)
+
+# Function to calculate correlation
+joint_cor <- function(x, y, P) {
+  px <- rowSums(P)
+  py <- colSums(P)
+
+  EX <- sum(x * px)
+  EY <- sum(y * py)
+
+  EXY <- sum(outer(x, y) * P)
+
+  covXY <- EXY - EX * EY
+
+  varX <- sum(x^2 * px) - EX^2
+  varY <- sum(y^2 * py) - EY^2
+
+  covXY / sqrt(varX * varY)
+}
+
+# Scoring system (i)
+cor1 <- joint_cor(x, c(1, 2, 3), P)
+
+# Scoring system (ii)
+cor2 <- joint_cor(x, c(1, 4, 5), P)
+
+round(c(System_i = cor1, System_ii = cor2), 4)
+```
+
+**Interpretation:**
+
+For scoring system (i), the correlation is approximately
+0.1907. For scoring system (ii), it is approximately 0.1898.
+
+Both values indicate a weak positive association between
+family income and happiness. The small difference shows
+that the numerical scores assigned to ordinal categories
+can affect the correlation.
+
+**Solution (b): Independence**
+
+```{r exercise-2-26-independence}
+# Joint probabilities under independence
+P_independent <- outer(px, py)
+
+rownames(P_independent) <- c("Below average",
+                             "Average",
+                             "Above average")
+
+colnames(P_independent) <- c("Not too happy",
+                             "Pretty happy",
+                             "Very happy")
+
+round(P_independent, 6)
+
+# Check that the marginals are unchanged
+rowSums(P_independent)
+colSums(P_independent)
+```
+
+**Interpretation:**
+
+The independent joint distribution is obtained by
+multiplying the corresponding marginal probabilities:
+
+$$
+P(X=x,Y=y)=P(X=x)P(Y=y).
+$$
+
+The resulting distribution preserves the original
+marginal probabilities while making family income
+and happiness independent.
+
+
+### Exercise 2.52
+
+**Solution (a)**
+
+Let $Y \sim N(\mu,\sigma^2)$ and define the standard
+normal random variable
+
+$$
+Z=\frac{Y-\mu}{\sigma}.
+$$
+
+By the definition of the cumulative distribution function,
+
+$$
+F(y)=P(Y\leq y).
+$$
+
+Since $\sigma>0$, standardizing gives
+
+$$
+F(y)=P\left(\frac{Y-\mu}{\sigma}
+\leq\frac{y-\mu}{\sigma}\right).
+$$
+
+Therefore,
+
+$$
+\boxed{F(y)=\Phi\left(\frac{y-\mu}{\sigma}\right)}.
+$$
+
+**Solution (b)**
+
+The probability density function is the derivative
+of the cumulative distribution function:
+
+$$
+f(y)=\frac{d}{dy}F(y).
+$$
+
+Using the result from part (a) and applying the
+chain rule,
+
+$$
+f(y)=\phi\left(\frac{y-\mu}{\sigma}\right)
+\frac{d}{dy}\left(\frac{y-\mu}{\sigma}\right).
+$$
+
+Hence,
+
+$$
+\boxed{f(y)=\frac{1}{\sigma}
+\phi\left(\frac{y-\mu}{\sigma}\right)}.
+$$
+
+From Equation (2.9), the standard normal density is
+
+$$
+\phi(z)=\frac{1}{\sqrt{2\pi}}e^{-z^2/2}.
+$$
+
+Substituting gives
+
+$$
+\boxed{
+f(y)=\frac{1}{\sigma\sqrt{2\pi}}
+e^{-\frac{(y-\mu)^2}{2\sigma^2}}
+}.
+$$
+
+This is Equation (2.8), the probability density
+function of a normal distribution.
+
+
+
+### Exercise 2.53
+
+**Solution**
+
+Let $Y \sim N(0,1)$ and define $X=\Phi(Y)$, where
+$\Phi$ is the standard normal cumulative distribution
+function.
+
+By the probability integral transformation, if $F$
+is the continuous CDF of a random variable $Y$,
+then $F(Y)$ follows a Uniform(0,1) distribution.
+
+Therefore,
+
+$$
+\boxed{X=\Phi(Y)\sim \mathrm{Uniform}(0,1)}.
+$$
+
+We verify this result by generating one million
+standard normal random values and transforming
+them using the standard normal CDF.
+
+```{r exercise-2-53}
+# Generate one million standard normal observations
+set.seed(123)
+y <- rnorm(1000000, mean = 0, sd = 1)
+
+# Apply the standard normal CDF
+x <- pnorm(y)
+
+# Display both histograms side by side
+par(mfrow = c(1, 2))
+
+hist(y,
+     breaks = 60,
+     probability = TRUE,
+     main = "Histogram of Y",
+     xlab = "Y values",
+     col = "lightblue",
+     border = "white")
+
+hist(x,
+     breaks = 60,
+     probability = TRUE,
+     main = "Histogram of X = Phi(Y)",
+     xlab = "X values",
+     col = "lightgreen",
+     border = "white")
+
+# Restore the default plotting layout
+par(mfrow = c(1, 1))
+```
+
+**Interpretation**
+
+The histogram of Y is approximately bell-shaped,
+as expected for a standard normal distribution.
+
+The histogram of X is approximately flat over
+the interval (0,1), confirming that X follows
+a Uniform(0,1) distribution.
+
+
+### Exercise 2.70
+
+**Solution (a): Uniform distribution**
+
+For alpha = beta = 1, the beta density becomes
+
+$$
+f(y;1,1)=
+\frac{\Gamma(2)}{\Gamma(1)\Gamma(1)}
+y^0(1-y)^0=1.
+$$
+
+Thus, for $0\leq y\leq1$, this is the density
+of a Uniform(0,1) distribution.
+
+**Solution (b): Expected value**
+
+By definition,
+
+$$
+E(Y)=\int_0^1 yf(y)\,dy.
+$$
+
+Substituting the beta density,
+
+$$
+E(Y)=
+\frac{\Gamma(\alpha+\beta)}
+{\Gamma(\alpha)\Gamma(\beta)}
+\int_0^1 y^\alpha(1-y)^{\beta-1}\,dy.
+$$
+
+Using the beta-gamma identity and
+$\Gamma(t+1)=t\Gamma(t)$,
+
+$$
+E(Y)=
+\frac{\Gamma(\alpha+\beta)\Gamma(\alpha+1)}
+{\Gamma(\alpha)\Gamma(\alpha+\beta+1)}
+=\boxed{\frac{\alpha}{\alpha+\beta}}.
+$$
+
+**Solution (c): Second moment and variance**
+
+Similarly,
+
+$$
+E(Y^2)=
+\frac{\Gamma(\alpha+\beta)\Gamma(\alpha+2)}
+{\Gamma(\alpha)\Gamma(\alpha+\beta+2)}
+=\boxed{
+\frac{\alpha(\alpha+1)}
+{(\alpha+\beta)(\alpha+\beta+1)}
+}.
+$$
+
+Using $Var(Y)=E(Y^2)-[E(Y)]^2$,
+
+$$
+Var(Y)=
+\frac{\alpha(\alpha+1)}
+{(\alpha+\beta)(\alpha+\beta+1)}
+-\frac{\alpha^2}{(\alpha+\beta)^2}.
+$$
+
+Simplifying,
+
+$$
+\boxed{
+Var(Y)=\frac{\alpha\beta}
+{(\alpha+\beta)^2(\alpha+\beta+1)}
+}.
+$$
+
+Since $\mu=\alpha/(\alpha+\beta)$,
+
+$$
+\boxed{
+Var(Y)=\frac{\mu(1-\mu)}{\alpha+\beta+1}
+}.
+$$
+
+For fixed $\alpha+\beta$, the variance is
+largest when $\mu=0.5$ and decreases as
+$\mu$ approaches 0 or 1.
+
+**Solution (d): Beta density plots**
+
+We use the R function `dbeta()` to plot
+beta probability density functions for
+different parameter combinations.
+
+```{r exercise-2-70-plots, fig.width=9, fig.height=4.5}
+# Values strictly inside (0,1)
+y <- seq(0.0001, 0.9999, length.out = 2000)
+
+# Three panels
+par(mfrow = c(1, 3))
+
+# (i) Equal parameters
+params <- c(0.5, 1, 10, 100)
+cols <- c("red", "blue", "darkgreen", "purple")
+
+plot(y, dbeta(y, 0.5, 0.5),
+     type = "l", col = cols[1], lwd = 2,
+     ylim = c(0, 9),
+     main = "Alpha = Beta",
+     xlab = "y", ylab = "Density")
+
+for (i in 2:4) {
+  lines(y, dbeta(y, params[i], params[i]),
+        col = cols[i], lwd = 2)
+}
+
+legend("topright",
+       legend = paste("a = b =", params),
+       col = cols, lty = 1, cex = 0.65)
+
+# (ii) Alpha greater than Beta
+plot(y, dbeta(y, 5, 2),
+     type = "l", col = "red", lwd = 2,
+     ylim = c(0, 4),
+     main = "Alpha > Beta",
+     xlab = "y", ylab = "Density")
+
+lines(y, dbeta(y, 10, 2),
+      col = "blue", lwd = 2)
+lines(y, dbeta(y, 3, 1),
+      col = "darkgreen", lwd = 2)
+
+legend("topleft",
+       legend = c("a=5, b=2", "a=10, b=2",
+                  "a=3, b=1"),
+       col = c("red", "blue", "darkgreen"),
+       lty = 1, cex = 0.65)
+
+# (iii) Alpha less than Beta
+plot(y, dbeta(y, 2, 5),
+     type = "l", col = "red", lwd = 2,
+     ylim = c(0, 4),
+     main = "Alpha < Beta",
+     xlab = "y", ylab = "Density")
+
+lines(y, dbeta(y, 2, 10),
+      col = "blue", lwd = 2)
+lines(y, dbeta(y, 1, 3),
+      col = "darkgreen", lwd = 2)
+
+legend("topright",
+       legend = c("a=2, b=5", "a=2, b=10",
+                  "a=1, b=3"),
+       col = c("red", "blue", "darkgreen"),
+       lty = 1, cex = 0.65)
+
+par(mfrow = c(1, 1))
+```
+
+**Interpretation**
+
+When alpha = beta, the distribution is symmetric.
+For alpha = beta = 0.5, it is U-shaped.
+For alpha = beta = 1, it is uniform.
+For alpha = beta = 10 or 100, it becomes
+increasingly concentrated around 0.5.
+
+When alpha > beta, the distribution is
+concentrated toward larger values of y.
+
+When alpha < beta, the distribution is
+concentrated toward smaller values of y.
+
+The total alpha + beta controls concentration,
+while their relative sizes determine the mean
+and the direction of asymmetry.
+
