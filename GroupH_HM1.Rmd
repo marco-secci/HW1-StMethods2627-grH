@@ -1,0 +1,286 @@
+---
+title: "Group H - Assignment Block B"
+author: "J. Al Sayed Kassem, B. Hadman, N. Pinat, M. Secci, F. Tomada"
+date: "2026-10-27"
+output:
+  html_document:
+    toc: true
+    toc_depth: '3'
+    df_print: paged
+  pdf_document:
+    toc: true
+    toc_depth: 3
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## CS - Chapter 1
+
+### Ex 1.1
+
+Exponential random variable, $X \ge 0$, has p.d.f. $f(x) = \lambda e^{-\lambda x}$.
+
+Find the c.d.f. and the quantile function for $X$.
+
+Find $\Pr(X \le a)$ and the median of $X$.
+
+Find the mean and variance of $X$.
+
+Solution
+
+Cumulative Distribution Function (c.d.f.) and Quantile:
+The cumulative distribution function $F(x)$ is obtained by integrating the probability density function from $0$ to $x$:
+
+$$F(x) = P(X \le x) = \int_{0}^{x} \lambda e^{-\lambda t} dt = \left[ -e^{-\lambda t} \right]_{0}^{x} = 1 - e^{-\lambda x} \quad (\text{for } x \ge 0)$$
+
+To find the quantile function $F^{-1}(p)$, we set $F(x)$ equal to $p$ and solve for $x$:
+
+$$1 - e^{-\lambda x} = p \implies e^{-\lambda x} = 1 - p \implies -\lambda x = \ln(1-p)$$
+
+From which we obtain the quantile function:
+
+$$Q(p) = -\frac{\ln(1-p)}{\lambda} \quad \text{for } p \in (0,1)$$
+
+Probability $\Pr(X \le a)$ and Median:
+
+The probability that $X$ is less than or equal to a constant $a \ge 0$ is given directly by the c.d.f.:
+
+$$\Pr(X \le a) = F(a) = 1 - e^{-\lambda a}$$
+
+The median corresponds to the quantile of order $p = 0.5$:
+
+$$\text{Median} = Q(0.5) = -\frac{\ln(1 - 0.5)}{\lambda} = -\frac{\ln(0.5)}{\lambda} = \frac{\ln(2)}{\lambda}$$
+
+Mean and Variance of $X$:
+
+Mean $E[X]$: Integrating by parts:
+
+$$E[X] = \int_{0}^{\infty} x \lambda e^{-\lambda x} dx = \left[ -x e^{-\lambda x} \right]_{0}^{\infty} + \int_{0}^{\infty} e^{-\lambda x} dx = 0 + \left[ -\frac{e^{-\lambda x}}{\lambda} \right]_{0}^{\infty} = \frac{1}{\lambda}$$
+
+Variance $\text{Var}(X)$: First, we calculate the second moment $E[X^2]$ (via integration by parts):
+
+$$E[X^2] = \int_{0}^{\infty} x^2 \lambda e^{-\lambda x} dx = \frac{2}{\lambda^2}$$
+
+Using the fundamental relationship of variance $\text{Var}(X) = E[X^2] - (E[X])^2$:
+
+$$\text{Var}(X) = \frac{2}{\lambda^2} - \left(\frac{1}{\lambda}\right)^2 = \frac{2 - 1}{\lambda^2} = \frac{1}{\lambda^2}$$
+
+### Ex 1.6
+
+Let $X$ and $Y$ be random variables with $\text{Var}(X) = \sigma_x^2$, $\text{Var}(Y) = \sigma_y^2$, and $\text{Cov}(X,Y) = \sigma_{xy}$. Find $\text{Var}(X+Y)$ and $\text{Var}(X-Y)$.
+
+Solution
+
+Recalling the properties of variance for the sum of two random variables (not necessarily independent):
+
+Variance of the sum $\text{Var}(X + Y)$:
+
+$$\text{Var}(X + Y) = \text{Var}(X) + \text{Var}(Y) + 2\text{Cov}(X,Y) = \sigma_x^2 + \sigma_y^2 + 2\sigma_{xy}$$
+
+Variance of the difference $\text{Var}(X - Y)$:
+
+$$\text{Var}(X - Y) = \text{Var}(X) + \text{Var}(-Y) + 2\text{Cov}(X, -Y) = \sigma_x^2 + \sigma_y^2 - 2\sigma_{xy}$$
+
+## CS - Chapter 3
+
+### Ex 3.5
+
+```{r Ex 3.5 CS, echo=T}
+# Setup
+set.seed(0)
+n <- 1000
+A <- matrix(runif(n*n), n, n)
+x.true <- runif(n)
+y <- A %*% x.true
+
+# B
+tempo_b <- system.time({
+  A_inv <- solve(A)          
+  x1 <- A_inv %*% y          
+})
+
+print("Time with explicit inverse:")
+print(tempo_b)
+
+
+# C
+tempo_c <- system.time({
+  x2 <- solve(A, y)          
+})
+
+error1 <- mean(abs(x1-x.true))
+error2 <- mean(abs(x2-x.true))
+
+print("Time with direct solution:")
+print(tempo_c)
+
+error1
+error2
+
+```
+Execution time is less in the second case due to possible optimization in the numerical algorithms, we have also an error of $1.356132 \times 10^{-12}$ solving with "solve()", so it is also more precise at finding the solution
+
+### Ex 3.6
+
+```{r}
+# ==============================================================================
+# Function for the Empirical C.D.F.
+# ==============================================================================
+# Definition based on the formula: F_hat(x) = #{x_i < x} / n
+# 
+# Arguments:
+#   - x        : numeric unordered vector of observations
+#   - plot.cdf : boolean (TRUE/FALSE). If TRUE, generates the step plot.
+# ==============================================================================
+
+compute_ecdf <- function(x, plot.cdf = FALSE) {
+  # Total number of observations
+  n <- length(x)
+  
+  if (n == 0) {
+    stop("The input vector is empty.")
+  }
+  
+  # a. Calculates the empirical c.d.f. for each element, preserving the original order
+  # For each element x[i], counts how many elements in the vector are strictly smaller (<)
+  ecdf_values <- sapply(x, function(xi) {
+    sum(x < xi) / n
+  })
+  
+  if (plot.cdf) {
+    x_ordinato <- sort(x)
+    y_ordinato <- (0:(n - 1)) / n
+    
+    plot(x_ordinato, y_ordinato, type = "s", lwd = 2, col = "blue",
+         main = "Empirical Cumulative Distribution Function (E.C.D.F.)",
+         xlab = "x", ylab = expression(hat(F)(x)))
+    grid()
+  }
+  
+  return(ecdf_values)
+}
+
+
+set.seed(42)
+
+campione <- rnorm(15)
+
+print("Original vector of observations:")
+print(campione)
+
+risultati_ecdf <- compute_ecdf(campione, plot.cdf = TRUE)
+
+print("Values of the empirical c.d.f. (in the order corresponding to the original vector):")
+print(risultati_ecdf)
+```
+
+## FSDS - Chapter 2
+
+### Ex 2.8
+
+Each time a person shops at a grocery store, the event of catching a cold or some other virus from another shopper is independent from visit to visit and has a constant probability over the year, equal to 0.01.
+
+1. **In 100 trips to this store over the course of a year, the probability of catching a virus while shopping there is $100(0.01) = 1.0$. What is wrong with this reasoning?**
+2. **Find the correct probability in (a).**
+
+**Solution**
+
+1. **Analysis of part (a):**
+   The reasoning is incorrect because it treats probabilities as linear cumulative quantities ($100 \times 0.01 = 1.0$). This erroneously assumes that the probabilities of independent events add up linearly and that the event becomes an absolute certainty (probability = 1). In reality, for repeated independent trials, the probability does not add up, but is calculated through the complementary event.
+
+2. **Calculation of the correct probability (b):**
+   * **Probability of not contracting the virus in a single trip:**
+     $$1 - 0.01 = 0.99$$
+   * **Probability of never contracting the virus in all 100 trips** (since they are independent events, the probabilities are multiplied):
+     $$P(\text{never}) = (0.99)^{100} \approx 0.366$$
+   * **Probability of contracting the virus at least once** (complementary event):
+     $$P(X \ge 1) = 1 - (0.99)^{100} \approx 1 - 0.366 = 0.634 \quad (63.4\%)$$
+
+---
+
+### Ex 2.16
+
+1. **In the first week, the observations from Sunday to Saturday are 10, 8, 14, 7, 21, 44, 60. Do you think that the Poisson distribution might describe the random variability of this phenomenon adequately? Why or why not?**
+2. **Would you expect the Poisson distribution to better describe, or more poorly describe, the number of weekly admissions to the hospital for a rare disease? Why?**
+
+**Solution**
+
+1. **Analysis of part (a):**
+   **No**, the Poisson distribution is not suitable to describe this phenomenon for two main reasons:
+   * **Overdispersion:** The Poisson distribution requires mean and variance to be equal ($\mu = \sigma^2$). In this sample the variance is enormously higher than the mean due to the high peaks reached in the last few days (up to 60).
+   * **Lack of stationarity:** The average rate $\lambda$ is not constant over time, but shows strong variability and an increasing trend towards the end of the week.
+
+2. **Analysis of part (b):**
+   **Yes**, we would expect the Poisson distribution to adequately describe the number of weekly hospital admissions for a rare disease.
+   * **Rationale:** In this case, admissions satisfy the fundamental hypotheses of the Poisson process: events are rare, occur independently, and the average admission rate ($\lambda$) over time can be considered reasonably constant, without extreme systematic fluctuations as in the previous case.
+
+## FSDS - Chapter 3
+
+### Ex 3.2
+
+*In an exit poll of 1648 voters in the 2020 Senatorial election in Arizona, 51.5% said they voted for Mark Kelly and 48.5% said they voted for Martha McSally.*
+
+*(a) Suppose that actually 50% of the population voted for Kelly. If this exit poll had the properties of a simple random sample, find the standard error of the sample proportion voting for him.*
+
+*(b) Under the 50% presumption, are the results of the exit poll surprising? Why? Would you be willing to predict the election outcome? Explain by (i) conducting a simulation; (ii) using the value found in (a) for the standard error.*
+
+**Solution**
+
+```{r ex3.2-data}
+n     <- 1648   # poll size
+p_obs <- 0.515  # observed proportion for Kelly
+p0    <- 0.5    # presumed population proportion (H0)
+```
+
+**(a)** Under $\pi = 0.5$, the number of votes for Kelly is $Y \sim \text{Bin}(n, \pi)$ and the sample proportion $\hat\pi = Y/n$ has standard error
+
+$$ \sigma_{\hat\pi} = \sqrt{\frac{\pi(1-\pi)}{n}}. $$
+
+```{r ex3.2-a}
+se <- sqrt(p0 * (1 - p0) / n)
+se
+```
+
+**(b)(i)** We simulate $10^6$ exit polls of size $n$ from a population where $\pi = 0.5$. `rbinom` returns counts, so we divide by $n$ to get proportions.
+
+```{r ex3.2-b-i}
+set.seed(0)
+B <- 1e6
+results <- rbinom(B, n, p0) / n
+mean(results); sd(results)
+
+hist(results, breaks = 50, main = "Sample proportions under H0: pi = 0.5",
+     xlab = "Sample proportion")
+abline(v = p_obs, col = "red", lwd = 2)
+
+# share of simulated polls with at least 51.5% for Kelly
+mean(results >= p_obs)
+```
+
+The simulated standard deviation (`r sprintf("%.5f", sd(results))`) matches the standard error from (a) (`r sprintf("%.5f", se)`), as expected. About `r round(100 * mean(results >= p_obs), 1)`% of the simulated polls give 51.5% or more for Kelly even though the race is exactly 50/50. By symmetry, about twice as many fall at least that far from 0.5 in either direction.
+
+**(b)(ii)** Using the standard error from (a), we measure how many standard errors the observed proportion lies from 0.5:
+
+```{r ex3.2-b-ii}
+z <- (p_obs - p0) / se
+z
+1 - pnorm(z)   # normal approximation, compare with the simulation
+```
+
+So 0.515 is only `r round(z, 2)` standard errors above 0.5. This is well within the range of about $\pm 3$ standard errors where almost all sample proportions fall, and the normal approximation gives nearly the same tail probability as the simulation.
+
+**Conclusion.** The poll result is not surprising under the 50% presumption: a tied race produces a poll this far from 50% quite often. So we would not be willing to predict that Kelly wins based on this poll alone. This is unlike the California exit poll in Section 3.1.1, where 65.5% was about 15 standard errors from 0.5. Also, real exit polls are not simple random samples, so the true uncertainty is likely larger than this standard error suggests.
+
+### Ex 3.16
+
+*According to the U.S. Census Bureau, the number of people in a household has a mean of 2.6 and a standard deviation of 1.5. Suppose the Census Bureau instead had estimated this mean using a random sample of 225 homes, and that sample had a mean of 2.4 and standard deviation of 1.4.*
+
+*Describe the center and spread of the (a) population distribution, (b) sample data distribution, (c) sampling distribution of the sample mean for 225 homes.*
+
+**Solution**
+
+Add comments to the solution.
+
+$$ Y \sim N(0,1)$$
