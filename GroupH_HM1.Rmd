@@ -886,7 +886,7 @@ result_b<-t.test(
 )
 ```
 
-```{r ex4.14-output}
+```{r ex4.14-output, results="hold"}
 # Formatted output: part (a)
 
 #%d displays an integer, such as the number of students.
@@ -944,7 +944,7 @@ This does not prove that the means are equal. It means we do not have enough evi
 
 **Solution**
 
-```{r ex4.34}
+```{r ex4.34, results="hold"}
 # uniform(0,1), pop. mean and mediam are both 0.5
 # setting a seed means that the code produces the same sequence so you can reproduce your results
 

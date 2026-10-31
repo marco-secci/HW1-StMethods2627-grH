@@ -1798,7 +1798,7 @@ print(&quot;Time with explicit inverse:&quot;)</code></pre>
 <pre><code>## [1] &quot;Time with explicit inverse:&quot;</code></pre>
 <pre class="r"><code>print(tempo_b)</code></pre>
 <pre><code>##    user  system elapsed 
-##   0.674   0.080   0.771</code></pre>
+##   0.718   0.024   0.760</code></pre>
 <pre class="r"><code># C
 tempo_c &lt;- system.time({
   x2 &lt;- solve(A, y)          
@@ -1811,7 +1811,7 @@ print(&quot;Time with direct solution:&quot;)</code></pre>
 <pre><code>## [1] &quot;Time with direct solution:&quot;</code></pre>
 <pre class="r"><code>print(tempo_c)</code></pre>
 <pre><code>##    user  system elapsed 
-##   0.190   0.000   0.196</code></pre>
+##   0.139   0.000   0.142</code></pre>
 <pre class="r"><code>error1</code></pre>
 <pre><code>## [1] 2.956833e-11</code></pre>
 <pre class="r"><code>error2</code></pre>
@@ -2563,51 +2563,42 @@ result_b&lt;-t.test(
 #%d displays an integer, such as the number of students.
 #%% displays a literal % inside sprintf(), so &quot;95%%&quot; prints as 95%.
 
-cat(&quot;\nEXERCISE 4.14 - WEEKLY TV HOURS\n&quot;)</code></pre>
-<pre><code>## 
-## EXERCISE 4.14 - WEEKLY TV HOURS</code></pre>
-<pre class="r"><code>cat(&quot;----------------------------------------\n&quot;)</code></pre>
-<pre><code>## ----------------------------------------</code></pre>
-<pre class="r"><code>cat(&quot;PART (a): Overall population mean\n\n&quot;)</code></pre>
-<pre><code>## PART (a): Overall population mean</code></pre>
-<pre class="r"><code>cat(sprintf(&quot;Sample size: %d\n&quot;, length(students$tv)))</code></pre>
-<pre><code>## Sample size: 60</code></pre>
-<pre class="r"><code>cat(sprintf(&quot;Sample mean: %.4f hours\n&quot;, mean(students$tv)))</code></pre>
-<pre><code>## Sample mean: 7.2667 hours</code></pre>
-<pre class="r"><code>cat(sprintf(&quot;Sample standard deviation: %.4f hours\n&quot;,
-            sd(students$tv)))</code></pre>
-<pre><code>## Sample standard deviation: 6.7173 hours</code></pre>
-<pre class="r"><code>cat(sprintf(
+cat(&quot;\nEXERCISE 4.14 - WEEKLY TV HOURS\n&quot;)
+cat(&quot;----------------------------------------\n&quot;)
+cat(&quot;PART (a): Overall population mean\n\n&quot;)
+
+cat(sprintf(&quot;Sample size: %d\n&quot;, length(students$tv)))
+cat(sprintf(&quot;Sample mean: %.4f hours\n&quot;, mean(students$tv)))
+cat(sprintf(&quot;Sample standard deviation: %.4f hours\n&quot;,
+            sd(students$tv)))
+
+cat(sprintf(
   &quot;95%% confidence interval: (%.4f, %.4f) hours\n&quot;,
   result_a$conf.int[1],
   result_a$conf.int[2]
-))</code></pre>
-<pre><code>## 95% confidence interval: (5.5314, 9.0019) hours</code></pre>
-<pre class="r"><code># Formatted output: part (b)
-cat(&quot;\nPART (b): Female minus male population means\n\n&quot;)</code></pre>
-<pre><code>## 
-## PART (b): Female minus male population means</code></pre>
-<pre class="r"><code>cat(sprintf(&quot;%-12s %8s %12s\n&quot;, &quot;Group&quot;, &quot;n&quot;, &quot;Mean hours&quot;))</code></pre>
-<pre><code>## Group               n   Mean hours</code></pre>
-<pre class="r"><code>cat(sprintf(&quot;%-12s %8d %12.4f\n&quot;,
-            &quot;Female&quot;, length(female), mean(female)))</code></pre>
-<pre><code>## Female             31       7.9839</code></pre>
-<pre class="r"><code>cat(sprintf(&quot;%-12s %8d %12.4f\n&quot;,
-            &quot;Male&quot;, length(male), mean(male)))</code></pre>
-<pre><code>## Male               29       6.5000</code></pre>
-<pre class="r"><code>cat(sprintf(
+))
+
+# Formatted output: part (b)
+cat(&quot;\nPART (b): Female minus male population means\n\n&quot;)
+
+cat(sprintf(&quot;%-12s %8s %12s\n&quot;, &quot;Group&quot;, &quot;n&quot;, &quot;Mean hours&quot;))
+cat(sprintf(&quot;%-12s %8d %12.4f\n&quot;,
+            &quot;Female&quot;, length(female), mean(female)))
+cat(sprintf(&quot;%-12s %8d %12.4f\n&quot;,
+            &quot;Male&quot;, length(male), mean(male)))
+
+cat(sprintf(
   &quot;\nEstimated difference: %.4f hours\n&quot;,
   mean(female) - mean(male)
-))</code></pre>
-<pre><code>## 
-## Estimated difference: 1.4839 hours</code></pre>
-<pre class="r"><code>cat(sprintf(
+))
+
+cat(sprintf(
   &quot;95%% confidence interval: (%.4f, %.4f) hours\n&quot;,
   result_b$conf.int[1],
   result_b$conf.int[2]
-))</code></pre>
-<pre><code>## 95% confidence interval: (-1.9979, 4.9656) hours</code></pre>
-<pre class="r"><code>cat(&quot;\nIt includes three possibilities:
+))
+
+cat(&quot;\nIt includes three possibilities:
 - Negative difference: females watch less TV on average.
 - Zero difference: females and males have the same population mean.
 - Positive difference: females watch more TV on average.
@@ -2617,6 +2608,24 @@ Therefore, the corresponding two-sided test does not reject equal population mea
 
 This does not prove that the means are equal. It means we do not have enough evidence to conclude that they differ, under the model assumptions.\n&quot;)</code></pre>
 <pre><code>## 
+## EXERCISE 4.14 - WEEKLY TV HOURS
+## ----------------------------------------
+## PART (a): Overall population mean
+## 
+## Sample size: 60
+## Sample mean: 7.2667 hours
+## Sample standard deviation: 6.7173 hours
+## 95% confidence interval: (5.5314, 9.0019) hours
+## 
+## PART (b): Female minus male population means
+## 
+## Group               n   Mean hours
+## Female             31       7.9839
+## Male               29       6.5000
+## 
+## Estimated difference: 1.4839 hours
+## 95% confidence interval: (-1.9979, 4.9656) hours
+## 
 ## It includes three possibilities:
 ## - Negative difference: females watch less TV on average.
 ## - Zero difference: females and males have the same population mean.
@@ -2700,28 +2709,31 @@ mse_median &lt;- mean((sample_medians - 0.5)^2)
 #cat() prints without the [1] prefix.
 #sprintf()lets you control decimal places and column alignment.
 
-cat(&quot;\nEXERCISE 4.34 - SIMULATION RESULTS\n&quot;)</code></pre>
-<pre><code>## 
-## EXERCISE 4.34 - SIMULATION RESULTS</code></pre>
-<pre class="r"><code>cat(&quot;----------------------------------------\n&quot;)</code></pre>
-<pre><code>## ----------------------------------------</code></pre>
-<pre class="r"><code>cat(&quot;Distribution: Uniform(0, 1)\n&quot;)</code></pre>
-<pre><code>## Distribution: Uniform(0, 1)</code></pre>
-<pre class="r"><code>cat(&quot;Sample size:&quot;, n, &quot;\n&quot;)</code></pre>
-<pre><code>## Sample size: 100</code></pre>
-<pre class="r"><code>cat(&quot;Number of simulations:&quot;, B, &quot;\n\n&quot;)</code></pre>
-<pre><code>## Number of simulations: 1e+05</code></pre>
-<pre class="r"><code>cat(sprintf(&quot;%-20s %12s\n&quot;, &quot;Estimator&quot;, &quot;MSE&quot;))</code></pre>
-<pre><code>## Estimator                     MSE</code></pre>
-<pre class="r"><code>cat(sprintf(&quot;%-20s %12.6f\n&quot;, &quot;Sample mean&quot;, mse_mean))</code></pre>
-<pre><code>## Sample mean              0.000834</code></pre>
-<pre class="r"><code>cat(sprintf(&quot;%-20s %12.6f\n&quot;, &quot;Sample median&quot;, mse_median))</code></pre>
-<pre><code>## Sample median            0.002419</code></pre>
-<pre class="r"><code>cat(sprintf(
+cat(&quot;\nEXERCISE 4.34 - SIMULATION RESULTS\n&quot;)
+cat(&quot;----------------------------------------\n&quot;)
+cat(&quot;Distribution: Uniform(0, 1)\n&quot;)
+cat(&quot;Sample size:&quot;, n, &quot;\n&quot;)
+cat(&quot;Number of simulations:&quot;, B, &quot;\n\n&quot;)
+
+cat(sprintf(&quot;%-20s %12s\n&quot;, &quot;Estimator&quot;, &quot;MSE&quot;))
+cat(sprintf(&quot;%-20s %12.6f\n&quot;, &quot;Sample mean&quot;, mse_mean))
+cat(sprintf(&quot;%-20s %12.6f\n&quot;, &quot;Sample median&quot;, mse_median))
+
+cat(sprintf(
   &quot;\nThe median&#39;s MSE is %.2f times the mean&#39;s MSE.\n&quot;,
   mse_median / mse_mean
 ))</code></pre>
 <pre><code>## 
+## EXERCISE 4.34 - SIMULATION RESULTS
+## ----------------------------------------
+## Distribution: Uniform(0, 1)
+## Sample size: 100 
+## Number of simulations: 1e+05 
+## 
+## Estimator                     MSE
+## Sample mean              0.000834
+## Sample median            0.002419
+## 
 ## The median&#39;s MSE is 2.90 times the mean&#39;s MSE.</code></pre>
 </div>
 </div>
