@@ -2752,6 +2752,138 @@ cat(sprintf(
 ## The median&#39;s MSE is 2.90 times the mean&#39;s MSE.</code></pre>
 </div>
 </div>
+  
+<div id="fsds---chapter-5" class="section level2">
+<h2>FSDS - Chapter 5</h2>
+<div id="ex-5.8" class="section level3">
+<h3>Ex 5.8</h3>
+<p><em>For the Students data file at the text website, analyze political ideology. (a) Test whether the population mean <span class="math inline">\(\mu\)</span> differs from 4.0, the moderate response. Report the P-value, and interpret. Make a conclusion using <span class="math inline">\(\alpha\)</span>-level = 0.05. (b) Construct the 95% confidence interval for <span class="math inline">\(\mu\)</span>. Explain how results relate to those of the test in (a).</em></p>
+<p><strong>Solution</strong></p>
+<p>First we load the data and extract the variable of interest:</p>
+<pre class="r"><code>Students &lt;- read.table(&quot;http://stat4ds.rwth-aachen.de/data/Students.dat&quot;, header = TRUE)
+y &lt;- Students$ideol</code></pre>
+<p>Second we compute the sample size, the sample mean and the sample standard deviation:</p>
+<p><span class="math display">\[\bar y = \frac{1}{n}\sum_{i=1}^n y_i, \qquad s = \sqrt{\frac{1}{n-1}\sum_{i=1}^n (y_i - \bar y)^2}\]</span></p>
+<pre class="r"><code>n &lt;- length(y)
+ybar &lt;- mean(y)
+s &lt;- sd(y)
+c(n = n, ybar = ybar, s = s)</code></pre>
+<pre><code>##         n      ybar         s 
+## 60.000000  3.033333  1.636104</code></pre>
+<p><strong>(a) Test whether <span class="math inline">\(\mu\)</span> differs from 4.0</strong></p>
+<p>We assume <span class="math inline">\(Y_i \sim \mathcal{N}(\mu, \sigma^2)\)</span> i.i.d., with <span class="math inline">\(\sigma^2\)</span> unknown; the parameter of interest is the population mean ideology <span class="math inline">\(\mu\)</span>. Since <span class="math inline">\(n = 60\)</span> is large, the t-test is reliable by the central limit theorem. &quot;Differs from&quot; gives no direction, so the alternative is two-sided:</p>
+<p><span class="math display">\[H_0: \mu = 4 \qquad H_1: \mu \neq 4\]</span></p>
+<p>Since <span class="math inline">\(\sigma^2\)</span> is unknown, we use the one-sample t-test statistic, which under <span class="math inline">\(H_0\)</span> follows a t distribution with <span class="math inline">\(n - 1 = 59\)</span> degrees of freedom:</p>
+<p><span class="math display">\[T = \frac{\bar Y - \mu_0}{\sqrt{S^2/n}} \sim t_{n-1} = t_{59}\]</span></p>
+<p>The standard error and the observed value of the test statistic are:</p>
+<p><span class="math display">\[se = \frac{s}{\sqrt n} = \frac{1.636}{\sqrt{60}} = 0.211, \qquad t_{obs} = \frac{\bar y - \mu_0}{se} = \frac{3.033 - 4}{0.211} = -4.576\]</span></p>
+<pre class="r"><code>mu0 &lt;- 4
+se &lt;- s / sqrt(n)
+t_obs &lt;- (ybar - mu0) / se
+c(se = se, t_obs = t_obs)</code></pre>
+<pre><code>##         se      t_obs 
+##  0.2112201 -4.5765844</code></pre>
+<p><strong>(a) Report the P-value and interpret</strong></p>
+<p>The alternative is two-sided, so we consider both tails; by the symmetry of the t distribution around 0:</p>
+<p><span class="math display">\[p = \Pr_{H_0}(|T| \ge |t_{obs}|) = 2\{1 - F_{t_{59}}(|t_{obs}|)\}\]</span></p>
+<pre class="r"><code>p_value &lt;- 2 * (1 - pt(abs(t_obs), df = n - 1))
+p_value</code></pre>
+<pre><code>## [1] 2.48372e-05</code></pre>
+<p>Interpretation: if <span class="math inline">\(\mu = 4\)</span>, the probability of a test statistic at least as extreme as <span class="math inline">\(|t_{obs}| = 4.576\)</span> is 0.0000248, so the observed data are very unlikely under <span class="math inline">\(H_0\)</span>.</p>
+<p><strong>(a) Conclusion using <span class="math inline">\(\alpha = 0.05\)</span></strong></p>
+<p>With the significance level split in the two tails, the rejection region is:</p>
+<p><span class="math display">\[R_\alpha = \{\, y : |T| \ge t_{n-1;\,1-\alpha/2} \,\}, \qquad t_{59;\,0.975} = 2.001\]</span></p>
+<pre class="r"><code>qt(0.975, df = n - 1)
+abs(t_obs) &gt;= qt(0.975, df = n - 1)
+p_value &lt; 0.05</code></pre>
+<pre><code>## [1] 2.000995
+## [1] TRUE
+## [1] TRUE</code></pre>
+<p>Since <span class="math inline">\(|t_{obs}| = 4.576 \ge 2.001\)</span> and <span class="math inline">\(p = 0.0000248 &lt; \alpha = 0.05\)</span>, we reject <span class="math inline">\(H_0\)</span> at the 5% level. The population mean political ideology differs from 4 (moderate); since <span class="math inline">\(\bar y = 3.03 &lt; 4\)</span>, it is below moderate.</p>
+<p>Check: the same test in one command:</p>
+<pre class="r"><code>t.test(y, mu = mu0)</code></pre>
+<pre><code>## 
+##  One Sample t-test
+## 
+## data:  y
+## t = -4.5766, df = 59, p-value = 2.484e-05
+## alternative hypothesis: true mean is not equal to 4
+## 95 percent confidence interval:
+##  2.610683 3.455984
+## sample estimates:
+## mean of x 
+##  3.033333</code></pre>
+<p><strong>(b) 95% confidence interval for <span class="math inline">\(\mu\)</span></strong></p>
+<p>From the same pivot as the test, with 0.025 in each tail (equi-tailed interval):</p>
+<p><span class="math display">\[\bar y \pm t_{n-1;\,0.975}\,\frac{s}{\sqrt n} = 3.033 \pm 2.001 \times 0.211 = 3.033 \pm 0.423 = (2.61,\ 3.46)\]</span></p>
+<pre class="r"><code>me &lt;- qt(0.975, df = n - 1) * se
+ci95 &lt;- ybar + c(-1, 1) * me
+me
+ci95</code></pre>
+<pre><code>## [1] 0.4226505
+## [1] 2.610683 3.455984</code></pre>
+<p>Interpretation: with 95% confidence, the population mean political ideology is between 2.61 and 3.46.</p>
+<p><strong>(b) How the results relate to the test in (a)</strong></p>
+<p>A two-sided test at level <span class="math inline">\(\alpha\)</span> rejects <span class="math inline">\(H_0: \mu = \mu_0\)</span> exactly when <span class="math inline">\(\mu_0\)</span> is outside the <span class="math inline">\((1-\alpha)\)</span> confidence interval. Here <span class="math inline">\(4 \notin (2.61,\ 3.46)\)</span>, which agrees with rejecting <span class="math inline">\(H_0\)</span> in (a).</p>
+</div>
+<div id="ex-5.50" class="section level3">
+<h3>Ex 5.50</h3>
+<p><em>A random sample of size 40 has <span class="math inline">\(\bar y = 120\)</span>. The P-value for testing <span class="math inline">\(H_0: \mu = 100\)</span> against <span class="math inline">\(H_a: \mu \neq 100\)</span> is 0.057. Explain what is incorrect about each of the following interpretations of this P-value, and provide a proper interpretation. (a) The probability that <span class="math inline">\(H_0\)</span> is correct equals 0.057. (b) The probability that <span class="math inline">\(\bar y = 120\)</span> if <span class="math inline">\(H_0\)</span> is true equals 0.057. (c) The probability of Type I error equals 0.057. (d) We can accept <span class="math inline">\(H_0\)</span> at the <span class="math inline">\(\alpha = 0.05\)</span> level.</em></p>
+<p><strong>Solution</strong></p>
+<p>Given: <span class="math inline">\(n = 40\)</span>, <span class="math inline">\(\bar y = 120\)</span>, <span class="math inline">\(\mu_0 = 100\)</span>, <span class="math inline">\(p = 0.057\)</span>. For a two-sided t-test with <span class="math inline">\(n - 1 = 39\)</span> degrees of freedom, the P-value is:</p>
+<p><span class="math display">\[p = \Pr_{H_0}(|T| \ge |t_{obs}|) = 2\{1 - F_{t_{39}}(|t_{obs}|)\} = 0.057\]</span></p>
+<p>that is, if <span class="math inline">\(\mu = 100\)</span>, the probability of a sample mean <span class="math inline">\(\bar y \ge 120\)</span> or <span class="math inline">\(\bar y \le 80\)</span> is 0.057.</p>
+<p><strong>(a) The probability that <span class="math inline">\(H_0\)</span> is correct equals 0.057</strong></p>
+<p>Incorrect: the P-value is computed assuming <span class="math inline">\(H_0\)</span> is true, so it cannot be the probability that <span class="math inline">\(H_0\)</span> is true; <span class="math inline">\(H_0\)</span> is not a random event (it is either true or false).</p>
+<p><strong>(b) The probability that <span class="math inline">\(\bar y = 120\)</span> if <span class="math inline">\(H_0\)</span> is true equals 0.057</strong></p>
+<p>Incorrect: the P-value is the probability of values at least as extreme as the observed one, in both tails:</p>
+<p><span class="math display">\[\Pr_{H_0}(\bar Y \ge 120 \ \text{or}\ \bar Y \le 80) = 0.057\]</span></p>
+<p>not the probability of the single value <span class="math inline">\(\bar y = 120\)</span>.</p>
+<p><strong>(c) The probability of Type I error equals 0.057</strong></p>
+<p>The probability of a Type I error is the significance level, fixed in advance:</p>
+<p><span class="math display">\[\Pr(\text{Type I error}) = \Pr_{H_0}(\text{reject } H_0) = \alpha\]</span></p>
+<p>Incorrect: the Type I error probability is <span class="math inline">\(\alpha\)</span>, a property of the procedure, not the P-value of the observed data.</p>
+<p><strong>(d) We can accept <span class="math inline">\(H_0\)</span> at the <span class="math inline">\(\alpha = 0.05\)</span> level</strong></p>
+<p>Incorrect: <span class="math inline">\(p = 0.057 &gt; 0.05\)</span> means we do not reject <span class="math inline">\(H_0\)</span>, but this does not prove that <span class="math inline">\(\mu = 100\)</span>: the data are only compatible with it. From the P-value we recover <span class="math inline">\(|t_{obs}|\)</span> and the standard error, and then the 95% confidence interval:</p>
+<p><span class="math display">\[|t_{obs}| = t_{39;\,1-p/2}, \qquad se = \frac{\bar y - \mu_0}{|t_{obs}|}, \qquad \bar y \pm t_{39;\,0.975}\, se\]</span></p>
+<pre class="r"><code>n &lt;- 40
+ybar &lt;- 120
+mu0 &lt;- 100
+p_value &lt;- 0.057
+
+t_abs &lt;- qt(1 - p_value / 2, df = n - 1)
+se &lt;- (ybar - mu0) / t_abs
+ci95 &lt;- ybar + c(-1, 1) * qt(0.975, df = n - 1) * se
+c(t_abs = t_abs, se = se)
+ci95</code></pre>
+<pre><code>##     t_abs        se 
+##  1.961397 10.196815 
+## [1]  99.375 140.625</code></pre>
+<p>100 is inside the 95% confidence interval, but so are all values up to about 140.6.</p>
+<p><strong>Proper interpretation</strong></p>
+<p>If <span class="math inline">\(\mu = 100\)</span>, a sample mean as far from 100 as 120 (or farther, in either direction) would occur with probability 0.057. Since <span class="math inline">\(p = 0.057 &gt; 0.05\)</span>, we do not reject <span class="math inline">\(H_0\)</span> at <span class="math inline">\(\alpha = 0.05\)</span>.</p>
+</div>
+<div id="ex-5.58" class="section level3">
+<h3>Ex 5.58</h3>
+<p><em>A researcher conducts a significance test every time she analyzes a new data set. Over time, she conducts 100 significance tests, each at the 0.05 level. If <span class="math inline">\(H_0\)</span> is true in every case, what is the probability distribution of the number of times she rejects <span class="math inline">\(H_0\)</span>, and how many times would we expect <span class="math inline">\(H_0\)</span> to be rejected?</em></p>
+<p><strong>Solution</strong></p>
+<p><strong>Probability distribution of the number of rejections</strong></p>
+<p>Since <span class="math inline">\(H_0\)</span> is true, rejecting it is a Type I error, so in each test:</p>
+<p><span class="math display">\[\Pr_{H_0}(\text{reject } H_0) = \alpha = 0.05\]</span></p>
+<p>Each test is a Bernoulli trial (reject / not reject) with probability 0.05, and the 100 tests are independent (a new data set each time). Therefore the number of rejections <span class="math inline">\(X\)</span> follows a binomial distribution:</p>
+<p><span class="math display">\[X \sim \text{Bin}(n = 100,\ \pi = 0.05), \qquad \Pr(X = x) = \binom{100}{x} 0.05^x\, 0.95^{100 - x}, \quad x = 0, 1, \dots, 100\]</span></p>
+<pre class="r"><code>n_tests &lt;- 100
+alpha &lt;- 0.05
+round(dbinom(0:10, size = n_tests, prob = alpha), 4)</code></pre>
+<pre><code>##  [1] 0.0059 0.0312 0.0812 0.1396 0.1781 0.1800 0.1500 0.1060 0.0649 0.0349
+## [11] 0.0167</code></pre>
+<p><strong>Expected number of rejections</strong></p>
+<p><span class="math display">\[E(X) = n\pi = 100 \times 0.05 = 5\]</span></p>
+<pre class="r"><code>n_tests * alpha</code></pre>
+<pre><code>## [1] 5</code></pre>
+<p>Conclusion: <span class="math inline">\(X \sim \text{Bin}(100, 0.05)\)</span>, and we expect <span class="math inline">\(H_0\)</span> to be rejected about 5 times, all of them Type I errors, even though <span class="math inline">\(H_0\)</span> is true in every case.</p>
+</div>
+</div>
 
 
 
