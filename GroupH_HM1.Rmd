@@ -1066,3 +1066,191 @@ cat(sprintf(
   mse_median / mse_mean
 ))
 ```
+
+## FSDS - Chapter 5
+
+### Ex 5.8
+
+*For the Students data file at the text website, analyze political ideology. (a) Test whether the population mean $\mu$ differs from 4.0, the moderate response. Report the P-value, and interpret. Make a conclusion using $\alpha$-level = 0.05. (b) Construct the 95% confidence interval for $\mu$. Explain how results relate to those of the test in (a).*
+
+**Solution**
+
+First we load the data and extract the variable of interest:
+
+```{r ex5.8-data}
+Students <- read.table("http://stat4ds.rwth-aachen.de/data/Students.dat", header = TRUE)
+y <- Students$ideol
+```
+
+Second we compute the sample size, the sample mean and the sample standard deviation:
+
+$$\bar y = \frac{1}{n}\sum_{i=1}^n y_i, \qquad s = \sqrt{\frac{1}{n-1}\sum_{i=1}^n (y_i - \bar y)^2}$$
+
+```{r ex5.8-stats}
+n <- length(y)
+ybar <- mean(y)
+s <- sd(y)
+c(n = n, ybar = ybar, s = s)
+```
+
+**(a) Test whether $\mu$ differs from 4.0**
+
+We assume $Y_i \sim \mathcal{N}(\mu, \sigma^2)$ i.i.d., with $\sigma^2$ unknown; the parameter of interest is the population mean ideology $\mu$. Since $n = 60$ is large, the t-test is reliable by the central limit theorem. "Differs from" gives no direction, so the alternative is two-sided:
+
+$$H_0: \mu = 4 \qquad H_1: \mu \neq 4$$
+
+Since $\sigma^2$ is unknown, we use the one-sample t-test statistic, which under $H_0$ follows a t distribution with $n - 1 = 59$ degrees of freedom:
+
+$$T = \frac{\bar Y - \mu_0}{\sqrt{S^2/n}} \sim t_{n-1} = t_{59}$$
+
+The standard error and the observed value of the test statistic are:
+
+$$se = \frac{s}{\sqrt n} = \frac{1.636}{\sqrt{60}} = 0.211, \qquad t_{obs} = \frac{\bar y - \mu_0}{se} = \frac{3.033 - 4}{0.211} = -4.576$$
+
+```{r ex5.8-tobs}
+mu0 <- 4
+se <- s / sqrt(n)
+t_obs <- (ybar - mu0) / se
+c(se = se, t_obs = t_obs)
+```
+
+**(a) Report the P-value and interpret**
+
+The alternative is two-sided, so we consider both tails; by the symmetry of the t distribution around 0:
+
+$$p = \Pr_{H_0}(|T| \ge |t_{obs}|) = 2\{1 - F_{t_{59}}(|t_{obs}|)\}$$
+
+```{r ex5.8-pvalue}
+p_value <- 2 * (1 - pt(abs(t_obs), df = n - 1))
+p_value
+```
+
+Interpretation: if $\mu = 4$, the probability of a test statistic at least as extreme as $|t_{obs}| = 4.576$ is 0.0000248, so the observed data are very unlikely under $H_0$.
+
+**(a) Conclusion using $\alpha = 0.05$**
+
+With the significance level split in the two tails, the rejection region is:
+
+$$R_\alpha = \{\, y : |T| \ge t_{n-1;\,1-\alpha/2} \,\}, \qquad t_{59;\,0.975} = 2.001$$
+
+```{r ex5.8-decision}
+qt(0.975, df = n - 1)
+abs(t_obs) >= qt(0.975, df = n - 1)
+p_value < 0.05
+```
+
+Since $|t_{obs}| = 4.576 \ge 2.001$ and $p = 0.0000248 < \alpha = 0.05$, we reject $H_0$ at the 5% level. The population mean political ideology differs from 4 (moderate); since $\bar y = 3.03 < 4$, it is below moderate.
+
+Check: the same test in one command:
+
+```{r ex5.8-ttest}
+t.test(y, mu = mu0)
+```
+
+**(b) 95% confidence interval for $\mu$**
+
+From the same pivot as the test, with 0.025 in each tail (equi-tailed interval):
+
+$$\bar y \pm t_{n-1;\,0.975}\,\frac{s}{\sqrt n} = 3.033 \pm 2.001 \times 0.211 = 3.033 \pm 0.423 = (2.61,\ 3.46)$$
+
+```{r ex5.8-ci}
+me <- qt(0.975, df = n - 1) * se
+ci95 <- ybar + c(-1, 1) * me
+me
+ci95
+```
+
+Interpretation: with 95% confidence, the population mean political ideology is between 2.61 and 3.46.
+
+**(b) How the results relate to the test in (a)**
+
+A two-sided test at level $\alpha$ rejects $H_0: \mu = \mu_0$ exactly when $\mu_0$ is outside the $(1-\alpha)$ confidence interval. Here $4 \notin (2.61,\ 3.46)$, which agrees with rejecting $H_0$ in (a).
+
+### Ex 5.50
+
+*A random sample of size 40 has $\bar y = 120$. The P-value for testing $H_0: \mu = 100$ against $H_a: \mu \neq 100$ is 0.057. Explain what is incorrect about each of the following interpretations of this P-value, and provide a proper interpretation. (a) The probability that $H_0$ is correct equals 0.057. (b) The probability that $\bar y = 120$ if $H_0$ is true equals 0.057. (c) The probability of Type I error equals 0.057. (d) We can accept $H_0$ at the $\alpha = 0.05$ level.*
+
+**Solution**
+
+Given: $n = 40$, $\bar y = 120$, $\mu_0 = 100$, $p = 0.057$. For a two-sided t-test with $n - 1 = 39$ degrees of freedom, the P-value is:
+
+$$p = \Pr_{H_0}(|T| \ge |t_{obs}|) = 2\{1 - F_{t_{39}}(|t_{obs}|)\} = 0.057$$
+
+that is, if $\mu = 100$, the probability of a sample mean $\bar y \ge 120$ or $\bar y \le 80$ is 0.057.
+
+**(a) The probability that $H_0$ is correct equals 0.057**
+
+Incorrect: the P-value is computed assuming $H_0$ is true, so it cannot be the probability that $H_0$ is true; $H_0$ is not a random event (it is either true or false).
+
+**(b) The probability that $\bar y = 120$ if $H_0$ is true equals 0.057**
+
+Incorrect: the P-value is the probability of values at least as extreme as the observed one, in both tails:
+
+$$\Pr_{H_0}(\bar Y \ge 120 \ \text{or}\ \bar Y \le 80) = 0.057$$
+
+not the probability of the single value $\bar y = 120$.
+
+**(c) The probability of Type I error equals 0.057**
+
+The probability of a Type I error is the significance level, fixed in advance:
+
+$$\Pr(\text{Type I error}) = \Pr_{H_0}(\text{reject } H_0) = \alpha$$
+
+Incorrect: the Type I error probability is $\alpha$, a property of the procedure, not the P-value of the observed data.
+
+**(d) We can accept $H_0$ at the $\alpha = 0.05$ level**
+
+Incorrect: $p = 0.057 > 0.05$ means we do not reject $H_0$, but this does not prove that $\mu = 100$: the data are only compatible with it. From the P-value we recover $|t_{obs}|$ and the standard error, and then the 95% confidence interval:
+
+$$|t_{obs}| = t_{39;\,1-p/2}, \qquad se = \frac{\bar y - \mu_0}{|t_{obs}|}, \qquad \bar y \pm t_{39;\,0.975}\, se$$
+
+```{r ex5.50}
+n <- 40
+ybar <- 120
+mu0 <- 100
+p_value <- 0.057
+
+t_abs <- qt(1 - p_value / 2, df = n - 1)
+se <- (ybar - mu0) / t_abs
+ci95 <- ybar + c(-1, 1) * qt(0.975, df = n - 1) * se
+c(t_abs = t_abs, se = se)
+ci95
+```
+
+100 is inside the 95% confidence interval, but so are all values up to about 140.6.
+
+**Proper interpretation**
+
+If $\mu = 100$, a sample mean as far from 100 as 120 (or farther, in either direction) would occur with probability 0.057. Since $p = 0.057 > 0.05$, we do not reject $H_0$ at $\alpha = 0.05$.
+
+### Ex 5.58
+
+*A researcher conducts a significance test every time she analyzes a new data set. Over time, she conducts 100 significance tests, each at the 0.05 level. If $H_0$ is true in every case, what is the probability distribution of the number of times she rejects $H_0$, and how many times would we expect $H_0$ to be rejected?*
+
+**Solution**
+
+**Probability distribution of the number of rejections**
+
+Since $H_0$ is true, rejecting it is a Type I error, so in each test:
+
+$$\Pr_{H_0}(\text{reject } H_0) = \alpha = 0.05$$
+
+Each test is a Bernoulli trial (reject / not reject) with probability 0.05, and the 100 tests are independent (a new data set each time). Therefore the number of rejections $X$ follows a binomial distribution:
+
+$$X \sim \text{Bin}(n = 100,\ \pi = 0.05), \qquad \Pr(X = x) = \binom{100}{x} 0.05^x\, 0.95^{100 - x}, \quad x = 0, 1, \dots, 100$$
+
+```{r ex5.58-dist}
+n_tests <- 100
+alpha <- 0.05
+round(dbinom(0:10, size = n_tests, prob = alpha), 4)
+```
+
+**Expected number of rejections**
+
+$$E(X) = n\pi = 100 \times 0.05 = 5$$
+
+```{r ex5.58-mean}
+n_tests * alpha
+```
+
+Conclusion: $X \sim \text{Bin}(100, 0.05)$, and we expect $H_0$ to be rejected about 5 times, all of them Type I errors, even though $H_0$ is true in every case.
