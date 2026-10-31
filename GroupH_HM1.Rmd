@@ -763,7 +763,7 @@ $$ Y \sim N(0,1)$$
 
 **Solution**
 
-```{r ex4.8}
+```{r ex4.8, results="hold"}
 p <- 0.30
 error <- 0.04
 confidence <- 0.90
