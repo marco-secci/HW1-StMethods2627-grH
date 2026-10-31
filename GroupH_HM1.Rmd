@@ -216,6 +216,476 @@ Each time a person shops at a grocery store, the event of catching a cold or som
    **Yes**, we would expect the Poisson distribution to adequately describe the number of weekly hospital admissions for a rare disease.
    * **Rationale:** In this case, admissions satisfy the fundamental hypotheses of the Poisson process: events are rare, occur independently, and the average admission rate ($\lambda$) over time can be considered reasonably constant, without extreme systematic fluctuations as in the previous case.
 
+### Ex 2.21
+
+**Question:** Plot the Gamma distribution with shape parameter
+k = 3 and scale parameters 0.5, 1, 2, 3, 4, 5.
+What is the effect of increasing the scale parameter?
+
+**Solution:**
+
+```{r gamma-exercise}
+# Set the shape and scale parameters
+k <- 3
+scales <- c(0.5, 1, 2, 3, 4, 5)
+
+# Create x values
+x <- seq(0, 40, length.out = 1000)
+
+# Plot the first Gamma distribution
+plot(x, dgamma(x, shape = k, scale = scales[1]),
+     type = "l", col = 1, lwd = 2,
+     ylim = c(0, 0.6),
+     xlab = "x", ylab = "Probability Density",
+     main = "Gamma Distribution (Shape = 3)")
+
+# Add the other distributions
+for (i in 2:length(scales)) {
+  lines(x, dgamma(x, shape = k, scale = scales[i]),
+        col = i, lwd = 2)
+}
+
+# Add the legend
+legend("topright",
+       legend = paste("Scale =", scales),
+       col = 1:6, lwd = 2, cex = 0.8)
+```
+
+**Interpretation:**
+
+Increasing the scale parameter makes the Gamma distribution
+more spread out and shifts it toward larger values.
+
+The mean and variance of a Gamma distribution are:
+
+$$
+E(X) = k\theta
+$$
+
+$$
+Var(X) = k\theta^2
+$$
+
+Since the shape parameter k = 3 remains fixed,
+increasing the scale parameter increases both
+the mean and the variance.
+
+The density curve becomes wider and flatter,
+while its total area remains equal to 1.
+
+### Ex 2.26
+
+**Question:** Refer to Table 2.4, cross-classifying happiness
+with family income.
+
+(a) Find and interpret the correlation using scores:
+(i) (1, 2, 3) for each variable;
+(ii) (1, 2, 3) for income and (1, 4, 5) for happiness.
+
+(b) Construct the joint distribution with the same marginal
+distributions, assuming independence.
+
+**Solution (a): Correlation**
+
+```{r exercise-2-26-correlation}
+# Joint probability distribution from Table 2.4
+P <- matrix(c(0.080, 0.198, 0.079,
+              0.043, 0.254, 0.143,
+              0.017, 0.105, 0.081),
+            nrow = 3, byrow = TRUE)
+
+# Marginal probabilities
+px <- rowSums(P)
+py <- colSums(P)
+
+# Income scores
+x <- c(1, 2, 3)
+
+# Function to calculate correlation
+joint_cor <- function(x, y, P) {
+  px <- rowSums(P)
+  py <- colSums(P)
+
+  EX <- sum(x * px)
+  EY <- sum(y * py)
+
+  EXY <- sum(outer(x, y) * P)
+
+  covXY <- EXY - EX * EY
+
+  varX <- sum(x^2 * px) - EX^2
+  varY <- sum(y^2 * py) - EY^2
+
+  covXY / sqrt(varX * varY)
+}
+
+# Scoring system (i)
+cor1 <- joint_cor(x, c(1, 2, 3), P)
+
+# Scoring system (ii)
+cor2 <- joint_cor(x, c(1, 4, 5), P)
+
+round(c(System_i = cor1, System_ii = cor2), 4)
+```
+
+**Interpretation:**
+
+For scoring system (i), the correlation is approximately
+0.1907. For scoring system (ii), it is approximately 0.1898.
+
+Both values indicate a weak positive association between
+family income and happiness. The small difference shows
+that the numerical scores assigned to ordinal categories
+can affect the correlation.
+
+**Solution (b): Independence**
+
+```{r exercise-2-26-independence}
+# Joint probabilities under independence
+P_independent <- outer(px, py)
+
+rownames(P_independent) <- c("Below average",
+                             "Average",
+                             "Above average")
+
+colnames(P_independent) <- c("Not too happy",
+                             "Pretty happy",
+                             "Very happy")
+
+round(P_independent, 6)
+
+# Check that the marginals are unchanged
+rowSums(P_independent)
+colSums(P_independent)
+```
+
+**Interpretation:**
+
+The independent joint distribution is obtained by
+multiplying the corresponding marginal probabilities:
+
+$$
+P(X=x,Y=y)=P(X=x)P(Y=y).
+$$
+
+The resulting distribution preserves the original
+marginal probabilities while making family income
+and happiness independent.
+
+
+### Ex 2.52
+
+**Solution (a)**
+
+Let $Y \sim N(\mu,\sigma^2)$ and define the standard
+normal random variable
+
+$$
+Z=\frac{Y-\mu}{\sigma}.
+$$
+
+By the definition of the cumulative distribution function,
+
+$$
+F(y)=P(Y\leq y).
+$$
+
+Since $\sigma>0$, standardizing gives
+
+$$
+F(y)=P\left(\frac{Y-\mu}{\sigma}
+\leq\frac{y-\mu}{\sigma}\right).
+$$
+
+Therefore,
+
+$$
+\boxed{F(y)=\Phi\left(\frac{y-\mu}{\sigma}\right)}.
+$$
+
+**Solution (b)**
+
+The probability density function is the derivative
+of the cumulative distribution function:
+
+$$
+f(y)=\frac{d}{dy}F(y).
+$$
+
+Using the result from part (a) and applying the
+chain rule,
+
+$$
+f(y)=\phi\left(\frac{y-\mu}{\sigma}\right)
+\frac{d}{dy}\left(\frac{y-\mu}{\sigma}\right).
+$$
+
+Hence,
+
+$$
+\boxed{f(y)=\frac{1}{\sigma}
+\phi\left(\frac{y-\mu}{\sigma}\right)}.
+$$
+
+From Equation (2.9), the standard normal density is
+
+$$
+\phi(z)=\frac{1}{\sqrt{2\pi}}e^{-z^2/2}.
+$$
+
+Substituting gives
+
+$$
+\boxed{
+f(y)=\frac{1}{\sigma\sqrt{2\pi}}
+e^{-\frac{(y-\mu)^2}{2\sigma^2}}
+}.
+$$
+
+This is Equation (2.8), the probability density
+function of a normal distribution.
+
+
+
+### Ex 2.53
+
+**Solution**
+
+Let $Y \sim N(0,1)$ and define $X=\Phi(Y)$, where
+$\Phi$ is the standard normal cumulative distribution
+function.
+
+By the probability integral transformation, if $F$
+is the continuous CDF of a random variable $Y$,
+then $F(Y)$ follows a Uniform(0,1) distribution.
+
+Therefore,
+
+$$
+\boxed{X=\Phi(Y)\sim \mathrm{Uniform}(0,1)}.
+$$
+
+We verify this result by generating one million
+standard normal random values and transforming
+them using the standard normal CDF.
+
+```{r exercise-2-53}
+# Generate one million standard normal observations
+set.seed(123)
+y <- rnorm(1000000, mean = 0, sd = 1)
+
+# Apply the standard normal CDF
+x <- pnorm(y)
+
+# Display both histograms side by side
+par(mfrow = c(1, 2))
+
+hist(y,
+     breaks = 60,
+     probability = TRUE,
+     main = "Histogram of Y",
+     xlab = "Y values",
+     col = "lightblue",
+     border = "white")
+
+hist(x,
+     breaks = 60,
+     probability = TRUE,
+     main = "Histogram of X = Phi(Y)",
+     xlab = "X values",
+     col = "lightgreen",
+     border = "white")
+
+# Restore the default plotting layout
+par(mfrow = c(1, 1))
+```
+
+**Interpretation**
+
+The histogram of Y is approximately bell-shaped,
+as expected for a standard normal distribution.
+
+The histogram of X is approximately flat over
+the interval (0,1), confirming that X follows
+a Uniform(0,1) distribution.
+
+
+### Ex 2.70
+
+**Solution (a): Uniform distribution**
+
+For alpha = beta = 1, the beta density becomes
+
+$$
+f(y;1,1)=
+\frac{\Gamma(2)}{\Gamma(1)\Gamma(1)}
+y^0(1-y)^0=1.
+$$
+
+Thus, for $0\leq y\leq1$, this is the density
+of a Uniform(0,1) distribution.
+
+**Solution (b): Expected value**
+
+By definition,
+
+$$
+E(Y)=\int_0^1 yf(y)\,dy.
+$$
+
+Substituting the beta density,
+
+$$
+E(Y)=
+\frac{\Gamma(\alpha+\beta)}
+{\Gamma(\alpha)\Gamma(\beta)}
+\int_0^1 y^\alpha(1-y)^{\beta-1}\,dy.
+$$
+
+Using the beta-gamma identity and
+$\Gamma(t+1)=t\Gamma(t)$,
+
+$$
+E(Y)=
+\frac{\Gamma(\alpha+\beta)\Gamma(\alpha+1)}
+{\Gamma(\alpha)\Gamma(\alpha+\beta+1)}
+=\boxed{\frac{\alpha}{\alpha+\beta}}.
+$$
+
+**Solution (c): Second moment and variance**
+
+Similarly,
+
+$$
+E(Y^2)=
+\frac{\Gamma(\alpha+\beta)\Gamma(\alpha+2)}
+{\Gamma(\alpha)\Gamma(\alpha+\beta+2)}
+=\boxed{
+\frac{\alpha(\alpha+1)}
+{(\alpha+\beta)(\alpha+\beta+1)}
+}.
+$$
+
+Using $Var(Y)=E(Y^2)-[E(Y)]^2$,
+
+$$
+Var(Y)=
+\frac{\alpha(\alpha+1)}
+{(\alpha+\beta)(\alpha+\beta+1)}
+-\frac{\alpha^2}{(\alpha+\beta)^2}.
+$$
+
+Simplifying,
+
+$$
+\boxed{
+Var(Y)=\frac{\alpha\beta}
+{(\alpha+\beta)^2(\alpha+\beta+1)}
+}.
+$$
+
+Since $\mu=\alpha/(\alpha+\beta)$,
+
+$$
+\boxed{
+Var(Y)=\frac{\mu(1-\mu)}{\alpha+\beta+1}
+}.
+$$
+
+For fixed $\alpha+\beta$, the variance is
+largest when $\mu=0.5$ and decreases as
+$\mu$ approaches 0 or 1.
+
+**Solution (d): Beta density plots**
+
+We use the R function `dbeta()` to plot
+beta probability density functions for
+different parameter combinations.
+
+```{r exercise-2-70-plots, fig.width=9, fig.height=4.5}
+# Values strictly inside (0,1)
+y <- seq(0.0001, 0.9999, length.out = 2000)
+
+# Three panels
+par(mfrow = c(1, 3))
+
+# (i) Equal parameters
+params <- c(0.5, 1, 10, 100)
+cols <- c("red", "blue", "darkgreen", "purple")
+
+plot(y, dbeta(y, 0.5, 0.5),
+     type = "l", col = cols[1], lwd = 2,
+     ylim = c(0, 9),
+     main = "Alpha = Beta",
+     xlab = "y", ylab = "Density")
+
+for (i in 2:4) {
+  lines(y, dbeta(y, params[i], params[i]),
+        col = cols[i], lwd = 2)
+}
+
+legend("topright",
+       legend = paste("a = b =", params),
+       col = cols, lty = 1, cex = 0.65)
+
+# (ii) Alpha greater than Beta
+plot(y, dbeta(y, 5, 2),
+     type = "l", col = "red", lwd = 2,
+     ylim = c(0, 4),
+     main = "Alpha > Beta",
+     xlab = "y", ylab = "Density")
+
+lines(y, dbeta(y, 10, 2),
+      col = "blue", lwd = 2)
+lines(y, dbeta(y, 3, 1),
+      col = "darkgreen", lwd = 2)
+
+legend("topleft",
+       legend = c("a=5, b=2", "a=10, b=2",
+                  "a=3, b=1"),
+       col = c("red", "blue", "darkgreen"),
+       lty = 1, cex = 0.65)
+
+# (iii) Alpha less than Beta
+plot(y, dbeta(y, 2, 5),
+     type = "l", col = "red", lwd = 2,
+     ylim = c(0, 4),
+     main = "Alpha < Beta",
+     xlab = "y", ylab = "Density")
+
+lines(y, dbeta(y, 2, 10),
+      col = "blue", lwd = 2)
+lines(y, dbeta(y, 1, 3),
+      col = "darkgreen", lwd = 2)
+
+legend("topright",
+       legend = c("a=2, b=5", "a=2, b=10",
+                  "a=1, b=3"),
+       col = c("red", "blue", "darkgreen"),
+       lty = 1, cex = 0.65)
+
+par(mfrow = c(1, 1))
+```
+
+**Interpretation**
+
+When alpha = beta, the distribution is symmetric.
+For alpha = beta = 0.5, it is U-shaped.
+For alpha = beta = 1, it is uniform.
+For alpha = beta = 10 or 100, it becomes
+increasingly concentrated around 0.5.
+
+When alpha > beta, the distribution is
+concentrated toward larger values of y.
+
+When alpha < beta, the distribution is
+concentrated toward smaller values of y.
+
+The total alpha + beta controls concentration,
+while their relative sizes determine the mean
+and the direction of asymmetry.
+
+
 ## FSDS - Chapter 3
 
 ### Ex 3.2
@@ -284,3 +754,275 @@ So 0.515 is only `r round(z, 2)` standard errors above 0.5. This is well within 
 Add comments to the solution.
 
 $$ Y \sim N(0,1)$$
+
+## FSDS - Chapter 4
+
+### Ex 4.8
+
+*To estimate the proportion of traffic deaths in California last year that were alcohol related, determine the necessary sample size for the estimate to be accurate to within 0.04 with probability 0.90. Based on results of studies reported by the National Highway Traffic Safety Administration (www.nhtsa.gov), we expect the proportion to be about 0.30.*
+
+**Solution**
+
+```{r ex4.8, results="hold"}
+p <- 0.30
+error <- 0.04
+confidence <- 0.90
+
+z <- qnorm(1 - (1 - confidence) / 2)
+
+s_required <- ceiling(z^2 * p * (1 - p) / error^2)
+
+#A sample size of 356 is required
+# Formatted output
+cat("\nEXERCISE 4.8 - REQUIRED SAMPLE SIZE\n")
+cat("----------------------------------------\n")
+cat("Confidence level: 90%\n")
+cat("Expected proportion: 0.30\n")
+cat("Margin of error: 0.04\n\n")
+
+cat(sprintf("Required sample size: %.0f\n", s_required))
+```
+
+### Ex 4.14
+
+*Using the Students data file, for the corresponding population, construct a 95% confidence interval (a) for the mean weekly number of hours spent watching TV; (b) to compare females and males on the mean weekly number of hours spent watching TV. In each case, state assumptions, including the practical importance of each, and interpret results.*
+
+**Solution**
+
+```{r ex4.14-data}
+#Import full data set from textbook
+#gender: 0=male, 1=female
+
+students <- read.table(header=TRUE, text="
+
+subject gender age hsgpa cogpa dhome dres tv sport news aids veg affil ideol relig abor affirm life 
+1     0  32  2.2  3.5  0     5.0  3   5  0   0  0  2  6  2  0  0  1
+2     1  23  2.1  3.5  1200  0.3  15  7  5   6  1  1  2  1  1  1  3
+3     1  27  3.3  3.0  1300  1.5  0   4  3   0  1  1  2  2  1  1  3 
+4     1  35  3.5  3.2  1500  8    5   5  6   3  0  3  4  1  1  1  2 
+5     0  23  3.1  3.5  1600  10   6   6  3   0  0  3  1  0  1  0  2 
+6     0  39  3.5  3.5  350   3    4   5  7   0  1  1  2  1  1  1  3
+7     0  24  3.6  3.7   0    .2   5  12  4   2  0  3  2  1  1  1  1 
+8     1  31  3.0  3.0  5000  1.5  5   3  3   1  0  3  2  1  1  1  1 
+9     0  34  3.0  3.0  5000  2    7   5  3   0  0  3  1  1  1  1  3
+10    0  28  4.0  3.1  900   2    1   1  2   1  1  3  3  0  0  1  1 
+11    0  23  2.3  2.6  253   1.5  10 15  1   1  0  2  5  1  0  1  1 
+12    1  27  3.5  3.6  190   3    14  3  7   0  0  1  2  1  1  1  3
+13    0  36  3.3  3.5  245   1.5  6  15 12   5  0  1  1  1  1  1  1 
+14    0  28  3.2  3.2  500   6    3  10  1   2  0  3  4  1  1  0  1
+15    1  28  3.0  3.5  3500  1    4   3  1   0  0  1  1  0  1  1  1
+16    1  25  3.8  3.3  210   10   7   6  1   0  1  3  2  3  1  1  1
+17    1  41  4.0  3.0  1000  15   6   7  3  10  0  3  3  3  0  0  1
+18    0  50  3.8  3.8  0     3    5   9  6  10  0  1  2  0  1  0  2 
+19    0  71  4.0  3.5  5000  3    6  12  2   2  0  3  2  0  1  0  2 
+20    1  28  3.0  3.8  120   1    25  0  0   2  1  1  1  1  1  1  1
+21    1  26  3.7  3.7  8000  8    4   4  4   1  0  3  4  1  1  1  1
+22    1  27  4.0  3.7  2     2.5  4   2  7   0  0  3  2  1  1  1  1
+23    0  31  2.7  3.5  1700  5    7   7  2   0  0  2  7  3  0  0  1
+24    1  23  3.7  3.7  2     2    7   4  2   0  0  3  4  0  1  1  1
+25    0  23  3.2  3.8  450   4    0   7  7   3  0  3  1  0  1  1  1
+26    1  44  3.0  3.0  0     2    2   3  2   3  1  3  3  2  1  1  1
+27    0  26  3.7  3.0  1000  3    8   2  7   0  0  1  2  1  1  1  3
+28    1  31  3.7  3.8  850  10    10  3  7   0  0  2  5  2  1  0  1 
+29    0  24  3.3  3.1  420   2    10  6  5   0  0  1  4  1  1  1  3
+30    1  26  3.3  3.3  1200  .75  10  0  3   0  0  2  2  1  1  1  3
+31    0  26  3.3  3.5  1000  1.5  0   3  3   3  1  1  2  1  1  1  2 
+32    1  32  3.5  3.9  150  12    10  2  0   0  0  1  2  1  0  0  1
+33    0  26  3.4  3.4  2000  1.5  2   7 14   0  0  1  2  0  1  1  2 
+34    1  22  3.2  2.8  316  2     10  3  5   2  0  3  2  1  1  1  3
+35    1  24  3.5  3.9  900  1.75  8   0  0   1  0  1  1  1  1  1  3 
+36    0  24  3.6  3.3  250   2    4   6  3   1  0  2  5  3  0  1  1 
+37    0  23  3.8  3.7  180  .5    10  5  7   0  0  3  2  0  1  0  3
+38    0  33  3.4  3.4  6000  1.5  8   5  6   2  0  3  2  0  1  1  2 
+39    0  23  2.8  3.2  950   2    37  10 5   0  0  2  5  2  1  0  1 
+40    0  31  3.8  3.5  1100  .75  .5  3  5   2  0  2  6  2  1  0  3
+41    0  26  3.4  3.4  1300  1.2  0   8  2   0  0  3  2  1  0  1  2
+42    0  28  2.0  3.0  360  .25  10   8  3   0  0  1  3  0  1  1  3
+43    1  24  3.8  3.9  1800  2    2   5  4   1  0  2  6  3  0  1  1 
+44    0  23  3.0  3.6  900   15  12   0  5   0  0  2  5  0  1  0  2 
+45    1  25  3.0  4.0  5000  5   1.5  0  4   0  0  3  4  1  1  1  2
+46    1  24  3.0  3.5  300   1   10   5  5   0  0  1  2  0  1  1  2
+47    1  27  3.0  3.8  2000  20  28   7 14   2  1  2  3  1  1  1  1 
+48    0  24  3.3  3.8  630   1.3  2   3  5   0  0  2  7  3  0  0  1
+49    1  26  3.8  4.0  1200  1    0   4  3   1  0  1  2  0  1  1  2
+50    1  27  3.0  4.0  580   2    5  15  1   2  0  1  1  1  1  1  2
+51    0  32  3.0  3.0  2000  5    5   5  2   1  0  2  5  3  0  1  1
+52    1  41  4.0  4.0  0     8    8   4  2   2  0  2  4  1  0  0  1
+53    1  29  3.0  3.9  300  3.7   2   5  1  11  0  1  2  1  1  1  1
+54    1  50  3.5  3.8  6    6     7   3  7   0  0  1  2  1  1  1  3
+55    1  22  3.4  3.7  80   7    10   1  2   2  0  3  2  0  1  1  3
+56    1  23  3.6  3.2  375  1.5  5    10 5   0  0  2  6  3  0  0  1
+57    0  26  3.5  3.6  2000  .3  16   8  3   0  0  1  4  1  1  1  3
+58    0  30  3.0  3.0  1    1.1  1    4  3   0  0  3  3  3  1  0  1
+59    1  23  3.0  3.0  112  .5   15   3  3   0  0  3  4  2  1  1  1 
+60    1  22  3.4  3.0  650  4    8   16  7   1  0  3  4  1  1  1  1
+")
+# View(students)
+```
+
+```{r ex4.14-a}
+# a) construct a 95% confidence interval (a) for the mean weekly number of hours spent watching TV
+
+
+result_a<- t.test(students$tv, conf.level=0.95)
+
+##Under the sampling assumptions, we are 95% confident that the
+# population mean weekly TV time is between 5.53 and 9.00 hours.
+```
+
+```{r ex4.14-b}
+# b) construct a 95% confidence interval to compare females and
+#males on the mean weekly number of hours spent watching TV
+
+female<- students$tv[students$gender==1]
+male<- students$tv[students$gender==0]
+
+
+result_b<-t.test(
+  female,
+  male,
+  var.equal = TRUE,
+  conf.level =0.95
+)
+```
+
+```{r ex4.14-output, results="hold"}
+# Formatted output: part (a)
+
+#%d displays an integer, such as the number of students.
+#%% displays a literal % inside sprintf(), so "95%%" prints as 95%.
+
+cat("\nEXERCISE 4.14 - WEEKLY TV HOURS\n")
+cat("----------------------------------------\n")
+cat("PART (a): Overall population mean\n\n")
+
+cat(sprintf("Sample size: %d\n", length(students$tv)))
+cat(sprintf("Sample mean: %.4f hours\n", mean(students$tv)))
+cat(sprintf("Sample standard deviation: %.4f hours\n",
+            sd(students$tv)))
+
+cat(sprintf(
+  "95%% confidence interval: (%.4f, %.4f) hours\n",
+  result_a$conf.int[1],
+  result_a$conf.int[2]
+))
+
+# Formatted output: part (b)
+cat("\nPART (b): Female minus male population means\n\n")
+
+cat(sprintf("%-12s %8s %12s\n", "Group", "n", "Mean hours"))
+cat(sprintf("%-12s %8d %12.4f\n",
+            "Female", length(female), mean(female)))
+cat(sprintf("%-12s %8d %12.4f\n",
+            "Male", length(male), mean(male)))
+
+cat(sprintf(
+  "\nEstimated difference: %.4f hours\n",
+  mean(female) - mean(male)
+))
+
+cat(sprintf(
+  "95%% confidence interval: (%.4f, %.4f) hours\n",
+  result_b$conf.int[1],
+  result_b$conf.int[2]
+))
+
+cat("\nIt includes three possibilities:
+- Negative difference: females watch less TV on average.
+- Zero difference: females and males have the same population mean.
+- Positive difference: females watch more TV on average.
+
+Although the sample difference is 1.484 hours, the uncertainty is large enough that zero remains compatible with the data.
+Therefore, the corresponding two-sided test does not reject equal population means at the 5% significance level.
+
+This does not prove that the means are equal. It means we do not have enough evidence to conclude that they differ, under the model assumptions.\n")
+```
+
+### Ex 4.34
+
+*Using simulation, conduct an investigation of whether the sample mean or median is a better estimator of the common value for the mean and median of a uniform distribution (to help during the solving of the exercise there will be explaination for each point of the code)*
+
+**Solution**
+
+```{r ex4.34, results="hold"}
+# uniform(0,1), pop. mean and mediam are both 0.5
+# setting a seed means that the code produces the same sequence so you can reproduce your results
+
+set.seed(123)
+
+#choose sample size and n of repetitions
+
+n<- 100
+B<- 100000
+
+#numeric(B) creates a vector containing 100,000 zeros.
+#These zeros are placeholders. During the simulation, we replace them with the mean and median calculated from each sample.
+
+sample_means<- numeric(B)
+sample_medians<- numeric(B)
+
+#This starts a loop. R runs the instructions inside { ... } repeatedly:
+#  - First, i = 1.
+#- Then, i = 2.
+#- It continues until i = 100000.
+
+for (i in 1:B) {
+  #runif() generates random observations from a uniform distribution.
+  x<-runif(n,min=0,max=1)
+  
+  sample_means[i]<-mean(x)
+  sample_medians[i]<- median(x)
+}
+
+#Once the loop finishes, you have 100,000 sample means and 100,000 sample medians, calculated from the same set of simulated samples.
+
+# Plot the sampling distributions side by side
+par(mfrow = c(1, 2))
+
+plot(density(sample_means),
+     main = "Sample mean", xlab = "Estimate",
+     xlim = c(0.3, 0.7))
+#density(sample mean) Estimates a smooth distribution curve from the simulated means
+# plot draws curve, xlab sets titel, xlim limit hor axis
+
+#add vertical line at center 0.5
+abline(v = 0.5, col = "red")
+
+#same for medians
+plot(density(sample_medians),
+     main = "Sample median", xlab = "Estimate",
+     xlim = c(0.3, 0.7))
+abline(v = 0.5, col = "red")
+
+#estimator whose results are more tightly concentrated around 0.5 has less sampling var, more accurate
+
+par(mfrow = c(1, 1))
+
+#calculate mse
+
+mse_mean <- mean((sample_means - 0.5)^2)
+mse_median <- mean((sample_medians - 0.5)^2)
+
+
+# Display a formatted summary in the Console
+#\n starts a new line.
+#%.6f displays six decimal places.
+#%-20s left-aligns text within a 20-character column.
+#cat() prints without the [1] prefix.
+#sprintf()lets you control decimal places and column alignment.
+
+cat("\nEXERCISE 4.34 - SIMULATION RESULTS\n")
+cat("----------------------------------------\n")
+cat("Distribution: Uniform(0, 1)\n")
+cat("Sample size:", n, "\n")
+cat("Number of simulations:", B, "\n\n")
+
+cat(sprintf("%-20s %12s\n", "Estimator", "MSE"))
+cat(sprintf("%-20s %12.6f\n", "Sample mean", mse_mean))
+cat(sprintf("%-20s %12.6f\n", "Sample median", mse_median))
+
+cat(sprintf(
+  "\nThe median's MSE is %.2f times the mean's MSE.\n",
+  mse_median / mse_mean
+))
+```
