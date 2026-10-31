@@ -751,9 +751,49 @@ So 0.515 is only `r round(z, 2)` standard errors above 0.5. This is well within 
 
 **Solution**
 
-Add comments to the solution.
+```{r ex3.16-data}
+mu    <- 2.6   # population mean (Census)
+sigma <- 1.5   # population SD (Census)
+n     <- 225   # sample size
+ybar  <- 2.4   # observed sample mean
+s     <- 1.4   # observed sample SD
+```
 
-$$ Y \sim N(0,1)$$
+**(a) Population distribution.** This is the distribution of household size over all U.S. homes. Its center is $\mu = 2.6$ and its spread is $\sigma = 1.5$. Household size is a positive count with a long right tail (many homes with 1–2 people, a few very large ones), so the distribution is skewed right, not normal.
+
+**(b) Sample data distribution.** This is the distribution of the 225 observed household sizes. Its center is $\bar y = 2.4$ and its spread is $s = 1.4$. These are close to, but not equal to, $\mu$ and $\sigma$: the sample is one random draw, so its mean and standard deviation change from sample to sample. Its shape should look like the population's (skewed right).
+
+**(c) Sampling distribution of $\bar Y$.** This is the distribution of the sample mean over all possible random samples of 225 homes. Its center is $E(\bar Y) = \mu = 2.6$ and its spread is the standard error
+
+$$ \sigma_{\bar Y} = \frac{\sigma}{\sqrt n} = \frac{1.5}{\sqrt{225}} = 0.1. $$
+
+In practice we would only have the sample, so we would estimate it with $s/\sqrt n$:
+
+```{r ex3.16-c}
+center_c  <- mu               # E(Ybar)
+se_theory <- sigma / sqrt(n)  # true standard error
+se_hat    <- s / sqrt(n)      # standard error estimated from the sample
+center_c; se_theory; se_hat
+```
+
+The estimate (`r round(se_hat, 3)`) is close to the true value (0.1). Because $n = 225$ is large, the Central Limit Theorem says $\bar Y$ is approximately normal, even though the population is skewed. The standard error is much smaller than $\sigma$ because averaging 225 homes cancels most of the variation between single households.
+
+**How unusual is $\bar y = 2.4$?**
+
+```{r ex3.16-z}
+z <- (ybar - mu) / se_theory
+z
+2 * pnorm(-abs(z))   # two-sided probability
+```
+
+```{r ex3.16-plot}
+curve(dnorm(x, center_c, se_theory), from = 2.2, to = 3.0,
+      main = "Sampling distribution of Ybar, n = 225",
+      xlab = "sample mean household size", ylab = "density")
+abline(v = ybar, col = "red", lty = 2)   # observed ybar
+```
+
+The observed mean is `r abs(z)` standard errors below $\mu$. A sample mean at least this far from 2.6 happens only about `r round(100 * 2 * pnorm(-abs(z)), 1)`% of the time, so 2.4 is somewhat unusual (but possible) if the true mean is 2.6.
 
 ## FSDS - Chapter 4
 
