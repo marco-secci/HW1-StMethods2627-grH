@@ -1798,7 +1798,7 @@ print(&quot;Time with explicit inverse:&quot;)</code></pre>
 <pre><code>## [1] &quot;Time with explicit inverse:&quot;</code></pre>
 <pre class="r"><code>print(tempo_b)</code></pre>
 <pre><code>##    user  system elapsed 
-##   0.649   0.083   0.823</code></pre>
+##   0.674   0.080   0.771</code></pre>
 <pre class="r"><code># C
 tempo_c &lt;- system.time({
   x2 &lt;- solve(A, y)          
@@ -1811,7 +1811,7 @@ print(&quot;Time with direct solution:&quot;)</code></pre>
 <pre><code>## [1] &quot;Time with direct solution:&quot;</code></pre>
 <pre class="r"><code>print(tempo_c)</code></pre>
 <pre><code>##    user  system elapsed 
-##   0.132   0.000   0.132</code></pre>
+##   0.190   0.000   0.196</code></pre>
 <pre class="r"><code>error1</code></pre>
 <pre><code>## [1] 2.956833e-11</code></pre>
 <pre class="r"><code>error2</code></pre>
@@ -2445,19 +2445,21 @@ s_required &lt;- ceiling(z^2 * p * (1 - p) / error^2)
 
 #A sample size of 356 is required
 # Formatted output
-cat(&quot;\nEXERCISE 4.8 - REQUIRED SAMPLE SIZE\n&quot;)</code></pre>
+cat(&quot;\nEXERCISE 4.8 - REQUIRED SAMPLE SIZE\n&quot;)
+cat(&quot;----------------------------------------\n&quot;)
+cat(&quot;Confidence level: 90%\n&quot;)
+cat(&quot;Expected proportion: 0.30\n&quot;)
+cat(&quot;Margin of error: 0.04\n\n&quot;)
+
+cat(sprintf(&quot;Required sample size: %.0f\n&quot;, s_required))</code></pre>
 <pre><code>## 
-## EXERCISE 4.8 - REQUIRED SAMPLE SIZE</code></pre>
-<pre class="r"><code>cat(&quot;----------------------------------------\n&quot;)</code></pre>
-<pre><code>## ----------------------------------------</code></pre>
-<pre class="r"><code>cat(&quot;Confidence level: 90%\n&quot;)</code></pre>
-<pre><code>## Confidence level: 90%</code></pre>
-<pre class="r"><code>cat(&quot;Expected proportion: 0.30\n&quot;)</code></pre>
-<pre><code>## Expected proportion: 0.30</code></pre>
-<pre class="r"><code>cat(&quot;Margin of error: 0.04\n\n&quot;)</code></pre>
-<pre><code>## Margin of error: 0.04</code></pre>
-<pre class="r"><code>cat(sprintf(&quot;Required sample size: %.0f\n&quot;, s_required))</code></pre>
-<pre><code>## Required sample size: 356</code></pre>
+## EXERCISE 4.8 - REQUIRED SAMPLE SIZE
+## ----------------------------------------
+## Confidence level: 90%
+## Expected proportion: 0.30
+## Margin of error: 0.04
+## 
+## Required sample size: 356</code></pre>
 </div>
 <div id="ex-4.14" class="section level3">
 <h3>Ex 4.14</h3>
