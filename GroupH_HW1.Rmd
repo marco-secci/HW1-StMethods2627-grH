@@ -1,6 +1,6 @@
 ---
-title: "Group H - Assignment Block B"
-author: "J. Al Sayed Kassem, B. Hadman, N. Pinat, M. Secci, F. Tomada"
+title: "Group H - Assignment Block A"
+author: "J. Al Sayed Kassem, B. Hamdan, N. Pinat, M. Secci, F. Tomada"
 date: "2026-10-27"
 output:
   html_document:
@@ -87,6 +87,18 @@ $$\text{Var}(X - Y) = \text{Var}(X) + \text{Var}(-Y) + 2\text{Cov}(X, -Y) = \sig
 
 ### Ex 3.5
 
+*Consider solving the matrix equation $Ax = y$ for $x$, where $y$ is a known $n$ vector and $A$ is a known $n \times n$ matrix. The formal solution to the problem is $x = A^{-1}y$, but it is possible to solve the equation directly, without actually forming $A^{-1}$. This question explores this direct solution. Read the help file for `solve` before trying it.*
+
+*(a) First create an $A$, $x$ and $y$ satisfying $Ax = y$: `set.seed(0); n <- 1000; A <- matrix(runif(n*n),n,n); x.true <- runif(n); y <- A%*%x.true`. The idea is to experiment with solving $Ax = y$ for $x$, but with a known truth to compare the answer to.*
+
+*(b) Using `solve`, form the matrix $A^{-1}$ explicitly and then form $x_1 = A^{-1}y$. Note how long this takes. Also assess the mean absolute difference between `x1` and `x.true` (the approximate mean absolute 'error' in the solution).*
+
+*(c) Now use `solve` to directly solve for $x$ without forming $A^{-1}$. Note how long this takes and assess the mean absolute error of the result.*
+
+*(d) What do you conclude?*
+
+**Solution**
+
 ```{r Ex 3.5 CS, echo=T}
 # Setup
 set.seed(0)
@@ -123,6 +135,18 @@ error2
 Execution time is less in the second case due to possible optimization in the numerical algorithms, we have also an error of $1.356132 \times 10^{-12}$ solving with "solve()", so it is also more precise at finding the solution
 
 ### Ex 3.6
+
+*The empirical cumulative distribution function for a set of measurements $\{x_i : i = 1, \dots, n\}$ is*
+
+$$\hat F(x) = \frac{\#\{x_i < x\}}{n}$$
+
+*where $\#\{x_i < x\}$ denotes 'number of $x_i$ values less than $x$'. When answering the following, try to ensure that your code is commented, clearly structured, and tested. To test your code, generate random samples using `rnorm`, `runif`, etc.*
+
+*(a) Write an R function that takes an unordered vector of observations `x` and returns the values of the empirical c.d.f. for each value, in the order corresponding to the original `x` vector. See `?sort.int`.*
+
+*(b) Modify your function to take an extra argument `plot.cdf`, that when `TRUE` will cause the empirical c.d.f. to be plotted as a step function over a suitable $x$ range.*
+
+**Solution**
 
 ```{r}
 # ==============================================================================
@@ -201,6 +225,8 @@ Each time a person shops at a grocery store, the event of catching a cold or som
 ---
 
 ### Ex 2.16
+
+Each day a hospital records the number of people who come to the emergency room for treatment.
 
 1. **In the first week, the observations from Sunday to Saturday are 10, 8, 14, 7, 21, 44, 60. Do you think that the Poisson distribution might describe the random variability of this phenomenon adequately? Why or why not?**
 2. **Would you expect the Poisson distribution to better describe, or more poorly describe, the number of weekly admissions to the hospital for a rare disease? Why?**
@@ -375,6 +401,12 @@ and happiness independent.
 
 ### Ex 2.52
 
+*The pdf $f$ of a $N(\mu, \sigma^2)$ distribution can be derived from the standard normal pdf $\phi$ shown in equation (2.9).*
+
+*(a) Show that the normal cdf $F$ relates to the standard normal cdf $\Phi$ by $F(y) = \Phi[(y - \mu)/\sigma]$.*
+
+*(b) From (a), show that $f(y) = (1/\sigma)\phi[(y - \mu)/\sigma]$, and show this is equation (2.8).*
+
 **Solution (a)**
 
 Let $Y \sim N(\mu,\sigma^2)$ and define the standard
@@ -449,6 +481,8 @@ function of a normal distribution.
 
 ### Ex 2.53
 
+*If $Y$ is a standard normal random variable, with cdf $\Phi$, what is the probability distribution of $X = \Phi(Y)$? Illustrate by randomly generating a million standard normal random variables, applying the cdf function $\Phi()$ to each, and plotting histograms of the (a) $y$ values, (b) $x$ values.*
+
 **Solution**
 
 Let $Y \sim N(0,1)$ and define $X=\Phi(Y)$, where
@@ -511,6 +545,20 @@ a Uniform(0,1) distribution.
 
 
 ### Ex 2.70
+
+*The beta distribution is a probability distribution over $(0, 1)$ that is often used in applications for which the random variable is a proportion. The beta pdf is*
+
+$$f(y; \alpha, \beta) = \frac{\Gamma(\alpha + \beta)}{\Gamma(\alpha)\Gamma(\beta)} y^{\alpha - 1}(1 - y)^{\beta - 1}, \quad 0 \le y \le 1, \qquad (2.20)$$
+
+*for parameters $\alpha$ and $\beta$, where $\Gamma(\cdot)$ denotes the gamma function.*
+
+*(a) Show that the uniform distribution is the special case $\alpha = \beta = 1$.*
+
+*(b) Show that $\mu = E(Y) = \alpha/(\alpha + \beta)$.*
+
+*(c) Find $E(Y^2)$. Show that $\text{var}(Y) = \alpha\beta/[(\alpha + \beta)^2(\alpha + \beta + 1)] = \mu(1 - \mu)/(\alpha + \beta + 1)$. For fixed $\alpha + \beta$, note that $\text{var}(Y)$ decreases as $\mu$ approaches 0 or 1.*
+
+*(d) Using a function such as `dbeta` in R, plot the beta pdf for (i) $\alpha = \beta = 0.5, 1.0, 10, 100$, (ii) some values of $\alpha > \beta$ and some values of $\alpha < \beta$. Describe the impact of $\alpha$ and $\beta$ on the shape and spread.*
 
 **Solution (a): Uniform distribution**
 
