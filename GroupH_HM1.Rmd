@@ -1,5 +1,5 @@
 ---
-title: "Group H - Assignment Block A"
+title: "Group H - Assignment Block B"
 author: "J. Al Sayed Kassem, B. Hadman, N. Pinat, M. Secci, F. Tomada"
 date: "2026-10-27"
 output:
@@ -794,6 +794,79 @@ abline(v = ybar, col = "red", lty = 2)   # observed ybar
 ```
 
 The observed mean is `r abs(z)` standard errors below $\mu$. A sample mean at least this far from 2.6 happens only about `r round(100 * 2 * pnorm(-abs(z)), 1)`% of the time, so 2.4 is somewhat unusual (but possible) if the true mean is 2.6.
+
+### Ex 3.24
+
+*Construct a population distribution that is plausible for Y = number of alcoholic drinks in the past day.*
+
+*(a) Simulate a single random sample of size n = 1000 from this population to reflect results of a typical sample survey. Summarize how the sample mean and standard deviation resemble those for the population.*
+
+*(b) Now draw 10,000 random samples of size 1000 each, to approximate the sampling distribution of $\bar Y$. Report the mean and standard deviation of this simulated sampling distribution, and compare to the theoretical values. Explain what this sampling distribution represents.*
+
+**Solution**
+
+**Population.** $Y$ is a count (0, 1, 2, …), so the population distribution is discrete and can't be negative. The most common answer is 0 drinks, many people had 1–2, and a few drank a lot. So we choose probabilities that are largest at 0 and decrease into a long right tail (skewed right):
+
+```{r ex3.24-pop}
+set.seed(0)
+y <- 0:10                                          # possible values
+p <- c(60, 35, 20, 15, 10, 8, 6, 4, 2, 1, 0.5)     # spike at 0, long right tail
+p <- p / sum(p)                                    # normalize
+round(p, 3)
+
+mu    <- sum(y * p)                  # population mean
+sigma <- sqrt(sum((y - mu)^2 * p))   # population SD
+mu; sigma
+
+barplot(p, names.arg = y, main = "Population distribution",
+        xlab = "drinks in the past day", ylab = "probability")
+```
+
+The population has $\mu = `r round(mu, 2)`$ and $\sigma = `r round(sigma, 2)`$. The SD is larger than the mean, which is typical of a skewed count.
+
+**(a)** We simulate one survey of $n = 1000$ people:
+
+```{r ex3.24-a}
+n <- 1000
+samp <- sample(y, n, replace = TRUE, prob = p)
+mean(samp); sd(samp)
+
+phat <- table(factor(samp, levels = y)) / n   # sample proportions
+barplot(rbind(p, phat), beside = TRUE, names.arg = y,
+        legend.text = c("population", "sample"),
+        main = "(a) Population vs. sample, n = 1000",
+        xlab = "drinks in the past day", ylab = "proportion")
+```
+
+The survey gives $\bar y = `r round(mean(samp), 2)`$ and $s = `r round(sd(samp), 2)`$, very close to $\mu = `r round(mu, 2)`$ and $\sigma = `r round(sigma, 2)`$, and the sample proportions match $p$ closely in the barplot. They are not exactly equal because the sample is one random draw: a different sample would give slightly different values. With a larger $n$ the sample data distribution resembles the population more closely.
+
+**(b)** We simulate 10,000 surveys of $n = 1000$ people and keep each sample mean:
+
+```{r ex3.24-b}
+B <- 10000
+ybars <- replicate(B, mean(sample(y, n, replace = TRUE, prob = p)))
+mean(ybars); sd(ybars)               # simulated center and spread
+
+center_theory <- mu                  # E(Ybar) = mu
+se_theory     <- sigma / sqrt(n)     # sigma_Ybar = sigma / sqrt(n)
+center_theory; se_theory
+
+hist(ybars, freq = FALSE, breaks = 50,
+     main = "(b) Sampling distribution of Ybar, n = 1000",
+     xlab = "sample mean drinks per day")
+curve(dnorm(x, center_theory, se_theory), add = TRUE, col = "blue", lwd = 2)  # CLT prediction
+abline(v = mu, col = "red", lty = 2)                                          # mu
+```
+
+The 10,000 sample means have mean `r round(mean(ybars), 3)` and SD `r round(sd(ybars), 4)`. Theory gives $E(\bar Y) = \mu = `r round(mu, 3)`$ and
+
+$$ \sigma_{\bar Y} = \frac{\sigma}{\sqrt n} = \frac{`r round(sigma, 2)`}{\sqrt{1000}} = `r round(se_theory, 4)`, $$
+
+so simulation and theory agree. The SD of $\bar Y$ is about $\sqrt{1000} \approx 32$ times smaller than $\sigma$: averaging 1000 people cancels out most of the person-to-person variation.
+
+**What the sampling distribution represents.** It is the distribution of the sample mean over all possible surveys of 1000 people: as if 10,000 agencies each ran the same survey and reported their own $\bar y$. It shows how much $\bar y$ varies from survey to survey, so it tells us how close one survey's $\bar y$ is likely to be to $\mu$ (almost always within about $3\sigma_{\bar Y} = `r round(3 * se_theory, 2)`$ drinks).
+
+**Shape.** The population is strongly skewed, but the histogram is bell-shaped and matches the normal curve $N(\mu, \sigma/\sqrt n)$. This is the Central Limit Theorem: for large $n$ the sampling distribution of $\bar Y$ is approximately normal whatever the shape of the population.
 
 ## FSDS - Chapter 4
 
